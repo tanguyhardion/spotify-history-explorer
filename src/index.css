@@ -4,3 +4,34 @@
 button:hover {
   cursor: pointer;
 }
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(31 41 55); /* bg-gray-800 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(75 85 99); /* bg-gray-600 */
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(107 114 128); /* bg-gray-500 */
+}
+
+::-webkit-scrollbar-corner {
+  background: rgb(31 41 55); /* bg-gray-800 */
+}
+
+/* Firefox scrollbar styles */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+}
