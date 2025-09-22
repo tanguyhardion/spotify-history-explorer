@@ -132,17 +132,10 @@ const MemoizedTrackRow = memo(TrackRow);
 
 function TrackList({ data, sort, onSort }: TrackListProps) {
   const itemContent = useCallback(
-    (index: number) => {
-      const play = data[index];
-      return (
-        <MemoizedTrackRow
-          key={`${play.ts}-${index}`}
-          play={play}
-          index={index}
-        />
-      );
-    },
-    [data],
+    (index: number, play: Play) => (
+      <MemoizedTrackRow key={`${play.ts}-${index}`} play={play} index={index} />
+    ),
+    [],
   );
 
   if (data.length === 0) {
@@ -158,16 +151,17 @@ function TrackList({ data, sort, onSort }: TrackListProps) {
 
   return (
     <div
-      className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden"
+      className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden flex flex-col"
       role="table"
       aria-label="Music listening history"
     >
       <TrackHeader sort={sort} onSort={onSort} />
-      <div role="rowgroup">
+      <div role="rowgroup" className="flex-1 min-h-0">
         <Virtuoso
           data={data}
           itemContent={itemContent}
           fixedItemHeight={44} // Approximate row height for better performance
+          className="h-full"
         />
       </div>
     </div>

@@ -80,7 +80,7 @@ function Stats({ data }: StatsProps) {
     },
     {
       label: "Most Played Artist",
-      value: `${stats.topArtist.name}${stats.topArtist.plays > 0 ? ` (${stats.topArtist.plays})` : ""}`,
+      value: `${stats.topArtist.name}`,
       tooltip: stats.topArtist.name,
     },
     {
