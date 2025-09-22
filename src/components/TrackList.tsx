@@ -1,87 +1,177 @@
-import { Virtuoso } from 'react-virtuoso';
-import type { Play, SortKey, SortState } from '../types';
-import { formatMs } from '../utils/format';
+import { Virtuoso } from "react-virtuoso";
+import { memo, useCallback } from "react";
+import type { Play, SortKey, SortState } from "../types";
+import { formatMs } from "../utils/format";
+import { APP_CONFIG } from "../constants/app";
 
-function Header({ 
-  sort, 
-  onSort 
-}: { 
-  sort: SortState; 
+interface TrackListProps {
+  data: Play[];
+  sort: SortState;
   onSort: (key: SortKey) => void;
-}) {
-  const getSortIcon = (key: SortKey) => {
-    if (sort.key !== key) return '';
-    return sort.direction === 'asc' ? ' ↑' : ' ↓';
-  };
+}
 
-  const headerClass = "cursor-pointer hover:text-gray-300 transition-colors select-none";
+interface HeaderProps {
+  sort: SortState;
+  onSort: (key: SortKey) => void;
+}
+
+interface TrackRowProps {
+  index: number;
+  play: Play;
+}
+
+const COLUMNS = [
+  { key: "ts" as const, label: "Time", span: "col-span-3" },
+  {
+    key: "master_metadata_track_name" as const,
+    label: "Track",
+    span: "col-span-3",
+  },
+  {
+    key: "master_metadata_album_artist_name" as const,
+    label: "Artist",
+    span: "col-span-2",
+  },
+  {
+    key: "master_metadata_album_album_name" as const,
+    label: "Album",
+    span: "col-span-3",
+  },
+  { key: "ms_played" as const, label: "Played", span: "col-span-1 text-right" },
+] as const;
+
+function getSortIcon(sortKey: SortKey, currentSort: SortState): string {
+  if (currentSort.key !== sortKey) return "";
+  return currentSort.direction === "asc" ? " ↑" : " ↓";
+}
+
+function formatTrackTimestamp(timestamp: string): string {
+  const date = new Date(timestamp);
+  return isNaN(date.getTime()) ? timestamp : date.toLocaleString();
+}
+
+function TrackHeader({ sort, onSort }: HeaderProps) {
+  const handleColumnClick = useCallback(
+    (key: SortKey) => {
+      onSort(key);
+    },
+    [onSort],
+  );
 
   return (
     <div className="grid grid-cols-12 gap-3 px-3 py-2 text-xs font-semibold uppercase text-gray-400 border-b border-gray-700 bg-gray-800 sticky top-0 z-10">
-      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('ts')}>
-        Time{getSortIcon('ts')}
-      </div>
-      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('master_metadata_track_name')}>
-        Track{getSortIcon('master_metadata_track_name')}
-      </div>
-      <div className={`col-span-2 ${headerClass}`} onClick={() => onSort('master_metadata_album_artist_name')}>
-        Artist{getSortIcon('master_metadata_album_artist_name')}
-      </div>
-      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('master_metadata_album_album_name')}>
-        Album{getSortIcon('master_metadata_album_album_name')}
-      </div>
-      <div className={`col-span-1 text-right ${headerClass}`} onClick={() => onSort('ms_played')}>
-        Played{getSortIcon('ms_played')}
-      </div>
+      {COLUMNS.map(({ key, label, span }) => (
+        <button
+          key={key}
+          type="button"
+          className={`${span} cursor-pointer hover:text-gray-300 transition-colors select-none text-left focus:outline-none focus:text-gray-300`}
+          onClick={() => handleColumnClick(key)}
+          aria-label={`Sort by ${label}`}
+        >
+          {label}
+          {getSortIcon(key, sort)}
+        </button>
+      ))}
     </div>
   );
 }
 
-function Row({ index, style, data }: { index: number; style: React.CSSProperties; data: Play[] }) {
-  const p = data[index] as Play;
-  const date = new Date(p.ts);
+function TrackRow({ play, index }: TrackRowProps) {
+  const formattedTime = formatTrackTimestamp(play.ts);
+  const playDuration = formatMs(play.ms_played || 0);
+
+  const trackName = play.master_metadata_track_name || "Unknown track";
+  const artistName = play.master_metadata_album_artist_name || "—";
+  const albumName = play.master_metadata_album_album_name || "—";
+
   return (
-    <div style={style} className="grid grid-cols-12 gap-3 px-3 py-2 text-sm items-center border-b border-gray-700 hover:bg-gray-700 bg-gray-800">
-      <div className="col-span-3 text-gray-300">{isNaN(date.getTime()) ? p.ts : date.toLocaleString()}</div>
+    <div
+      className="grid grid-cols-12 gap-3 px-3 py-2 text-sm items-center border-b border-gray-700 hover:bg-gray-700 bg-gray-800 transition-colors"
+      role="row"
+      aria-rowindex={index + 2} // +2 because header is row 1
+    >
+      <div className="col-span-3 text-gray-300" title={formattedTime}>
+        {formattedTime}
+      </div>
+
       <div className="col-span-3 truncate">
-        {p.spotify_track_uri ? (
+        {play.spotify_track_uri ? (
           <a
-            href={p.spotify_track_uri}
+            href={play.spotify_track_uri}
             target="_blank"
-            rel="noreferrer"
-            className="text-green-400 hover:underline"
-            title={p.master_metadata_track_name || ''}
+            rel="noopener noreferrer"
+            className={`text-${APP_CONFIG.brandColor} hover:underline focus:outline-none focus:underline`}
+            title={trackName}
+            aria-label={`Open ${trackName} in Spotify`}
           >
-            {p.master_metadata_track_name || 'Unknown track'}
+            {trackName}
           </a>
         ) : (
-          <span className="text-gray-400">{p.master_metadata_track_name || 'Unknown track'}</span>
+          <span className="text-gray-400" title={trackName}>
+            {trackName}
+          </span>
         )}
       </div>
-      <div className="col-span-2 truncate text-gray-200" title={p.master_metadata_album_artist_name || ''}>
-        {p.master_metadata_album_artist_name || '—'}
+
+      <div className="col-span-2 truncate text-gray-200" title={artistName}>
+        {artistName}
       </div>
-      <div className="col-span-3 truncate text-gray-200" title={p.master_metadata_album_album_name || ''}>
-        {p.master_metadata_album_album_name || '—'}
+
+      <div className="col-span-3 truncate text-gray-200" title={albumName}>
+        {albumName}
       </div>
-      <div className="col-span-1 text-right tabular-nums text-gray-200">{formatMs(p.ms_played || 0)}</div>
+
+      <div className="col-span-1 text-right tabular-nums text-gray-200">
+        {playDuration}
+      </div>
     </div>
   );
 }
 
-export default function TrackList({ 
-  data, 
-  sort, 
-  onSort 
-}: { 
-  data: Play[]; 
-  sort: SortState; 
-  onSort: (key: SortKey) => void;
-}) {
+const MemoizedTrackRow = memo(TrackRow);
+
+function TrackList({ data, sort, onSort }: TrackListProps) {
+  const itemContent = useCallback(
+    (index: number) => {
+      const play = data[index];
+      return (
+        <MemoizedTrackRow
+          key={`${play.ts}-${index}`}
+          play={play}
+          index={index}
+        />
+      );
+    },
+    [data],
+  );
+
+  if (data.length === 0) {
+    return (
+      <div className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden flex items-center justify-center">
+        <div className="text-center text-gray-400">
+          <p className="text-lg font-medium">No tracks found</p>
+          <p className="text-sm">Try adjusting your search filters</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden">
-      <Header sort={sort} onSort={onSort} />
-      <Virtuoso data={data} itemContent={(index) => <Row index={index} style={{}} data={data} />} />
+    <div
+      className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden"
+      role="table"
+      aria-label="Music listening history"
+    >
+      <TrackHeader sort={sort} onSort={onSort} />
+      <div role="rowgroup">
+        <Virtuoso
+          data={data}
+          itemContent={itemContent}
+          fixedItemHeight={44} // Approximate row height for better performance
+        />
+      </div>
     </div>
   );
 }
+
+export default memo(TrackList);

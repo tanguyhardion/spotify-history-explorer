@@ -43,4 +43,3 @@ Your data never leaves your browser: parsing, storage, and filtering happen enti
 - Tailwind CSS
 - IndexedDB via `idb`
 - Virtual list via `react-virtuoso`
-

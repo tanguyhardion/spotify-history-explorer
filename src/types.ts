@@ -9,14 +9,14 @@ export type Play = {
 
 export type SortKey = keyof Pick<
   Play,
-  | 'ts'
-  | 'ms_played'
-  | 'master_metadata_track_name'
-  | 'master_metadata_album_artist_name'
-  | 'master_metadata_album_album_name'
+  | "ts"
+  | "ms_played"
+  | "master_metadata_track_name"
+  | "master_metadata_album_artist_name"
+  | "master_metadata_album_album_name"
 >;
 
 export type SortState = {
   key: SortKey;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 };

@@ -1,10 +1,10 @@
-import { openDB } from 'idb';
-import type { DBSchema, IDBPDatabase } from 'idb';
-import type { Play } from './types';
+import { openDB } from "idb";
+import type { DBSchema, IDBPDatabase } from "idb";
+import type { Play } from "./types";
 
-const DB_NAME = 'spotify-history-explorer';
+const DB_NAME = "spotify-history-explorer";
 const DB_VERSION = 1;
-const STORE = 'plays';
+const STORE = "plays";
 
 interface HistoryDB extends DBSchema {
   [STORE]: {
@@ -22,10 +22,10 @@ function getDB() {
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE)) {
           const store = db.createObjectStore(STORE, {
-            keyPath: 'id',
+            keyPath: "id",
             autoIncrement: true,
           });
-          store.createIndex('ts', 'ts');
+          store.createIndex("ts", "ts");
         }
       },
     });
@@ -40,7 +40,7 @@ export async function clearPlays() {
 
 export async function addPlaysBulk(plays: Play[]) {
   const db = await getDB();
-  const tx = db.transaction(STORE, 'readwrite');
+  const tx = db.transaction(STORE, "readwrite");
   const store = tx.store;
   for (const p of plays) {
     await store.add(p);
