@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Global button styles */
+button:hover {
+  cursor: pointer;
+}

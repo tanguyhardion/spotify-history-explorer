@@ -1,15 +1,38 @@
 import { Virtuoso } from 'react-virtuoso';
-import type { Play } from '../types';
+import type { Play, SortKey, SortState } from '../types';
 import { formatMs } from '../utils/format';
 
-function Header() {
+function Header({ 
+  sort, 
+  onSort 
+}: { 
+  sort: SortState; 
+  onSort: (key: SortKey) => void;
+}) {
+  const getSortIcon = (key: SortKey) => {
+    if (sort.key !== key) return '';
+    return sort.direction === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  const headerClass = "cursor-pointer hover:text-gray-300 transition-colors select-none";
+
   return (
     <div className="grid grid-cols-12 gap-3 px-3 py-2 text-xs font-semibold uppercase text-gray-400 border-b border-gray-700 bg-gray-800 sticky top-0 z-10">
-      <div className="col-span-3">Time</div>
-      <div className="col-span-3">Track</div>
-      <div className="col-span-2">Artist</div>
-      <div className="col-span-3">Album</div>
-      <div className="col-span-1 text-right">Played</div>
+      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('ts')}>
+        Time{getSortIcon('ts')}
+      </div>
+      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('master_metadata_track_name')}>
+        Track{getSortIcon('master_metadata_track_name')}
+      </div>
+      <div className={`col-span-2 ${headerClass}`} onClick={() => onSort('master_metadata_album_artist_name')}>
+        Artist{getSortIcon('master_metadata_album_artist_name')}
+      </div>
+      <div className={`col-span-3 ${headerClass}`} onClick={() => onSort('master_metadata_album_album_name')}>
+        Album{getSortIcon('master_metadata_album_album_name')}
+      </div>
+      <div className={`col-span-1 text-right ${headerClass}`} onClick={() => onSort('ms_played')}>
+        Played{getSortIcon('ms_played')}
+      </div>
     </div>
   );
 }
@@ -46,10 +69,18 @@ function Row({ index, style, data }: { index: number; style: React.CSSProperties
   );
 }
 
-export default function TrackList({ data }: { data: Play[] }) {
+export default function TrackList({ 
+  data, 
+  sort, 
+  onSort 
+}: { 
+  data: Play[]; 
+  sort: SortState; 
+  onSort: (key: SortKey) => void;
+}) {
   return (
     <div className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden">
-      <Header />
+      <Header sort={sort} onSort={onSort} />
       <Virtuoso data={data} itemContent={(index) => <Row index={index} style={{}} data={data} />} />
     </div>
   );
