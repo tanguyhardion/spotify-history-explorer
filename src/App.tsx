@@ -12,7 +12,7 @@ import type { Play } from "./types";
 function AppContent() {
   const { data, isLoading, error, setData, clearError } = useSpotifyData();
   const { query, setQuery, clearQuery } = useSearch();
-  const { sort, changeSort, resetSort } = useSort();
+  const { sort, changeSort } = useSort();
 
   const filteredData = useFilteredData({ data, query, sort });
 
@@ -24,11 +24,6 @@ function AppContent() {
     },
     [setData, clearQuery],
   );
-
-  const handleClearFilters = useCallback(() => {
-    clearQuery();
-    resetSort();
-  }, [clearQuery, resetSort]);
 
   // Show loading state
   if (isLoading) {
@@ -66,7 +61,6 @@ function AppContent() {
       setQuery={setQuery}
       sort={sort}
       onSort={changeSort}
-      onClear={handleClearFilters}
       onDataUpload={handleDataUpload}
     />
   );

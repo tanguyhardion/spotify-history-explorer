@@ -79,7 +79,7 @@ function Stats({ data }: StatsProps) {
       value: stats.totalPlaytime,
     },
     {
-      label: "Most Played Artist",
+      label: "Most Played Artist (by plays)",
       value: `${stats.topArtist.name}`,
       tooltip: stats.topArtist.name,
     },

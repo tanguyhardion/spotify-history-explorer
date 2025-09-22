@@ -12,7 +12,6 @@ interface MainLayoutProps {
   setQuery: (query: string) => void;
   sort: SortState;
   onSort: (key: SortKey) => void;
-  onClear: () => void;
   onDataUpload: (data: Play[]) => void;
 }
 
@@ -23,7 +22,6 @@ export function MainLayout({
   setQuery,
   sort,
   onSort,
-  onClear,
   onDataUpload,
 }: MainLayoutProps) {
   return (
@@ -41,7 +39,6 @@ export function MainLayout({
             setQuery={setQuery}
             total={data.length}
             filteredCount={filteredData.length}
-            onClear={onClear}
           />
           <TrackList data={filteredData} sort={sort} onSort={onSort} />
         </div>

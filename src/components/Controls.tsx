@@ -5,7 +5,6 @@ interface ControlsProps {
   setQuery: (query: string) => void;
   total: number;
   filteredCount: number;
-  onClear: () => void;
 }
 
 function Controls({
@@ -13,7 +12,6 @@ function Controls({
   setQuery,
   total,
   filteredCount,
-  onClear,
 }: ControlsProps) {
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
@@ -23,6 +21,10 @@ function Controls({
     if (event.key === "Escape") {
       setQuery("");
     }
+  };
+
+  const handleClearClick = () => {
+    setQuery("");
   };
 
   return (
@@ -35,7 +37,7 @@ function Controls({
             onChange={handleQueryChange}
             onKeyDown={handleKeyDown}
             placeholder="Search tracks, artists, albums…"
-            className="w-72 max-w-full px-3 py-2 pl-10 border border-gray-600 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 backdrop-blur text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-72 max-w-full px-3 py-2 pl-10 pr-10 border border-gray-600 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 backdrop-blur text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             aria-label="Search your music history"
           />
           <svg
@@ -52,6 +54,27 @@ function Controls({
               d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
+          {query && (
+            <button
+              onClick={handleClearClick}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 transition-colors focus:outline-none focus:text-gray-200 rounded"
+              aria-label="Clear search"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -65,13 +88,6 @@ function Controls({
             `${total.toLocaleString()} plays`
           )}
         </span>
-        <button
-          onClick={onClear}
-          className="px-3 py-2 rounded-md border border-gray-600 hover:bg-gray-700 bg-gray-800 text-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
-          aria-label="Clear all filters and reset view"
-        >
-          Clear filters
-        </button>
       </div>
     </div>
   );
