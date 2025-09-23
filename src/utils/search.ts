@@ -37,7 +37,7 @@ export function parseSearchQuery(query: string): SearchTerm[] {
     .trim()
     .split(/\s+/)
     .filter((term) => term.length > 0);
-  
+
   generalTerms.forEach((term) => {
     terms.push({ type: "general", value: term.toLowerCase(), isExact: false });
   });
@@ -51,12 +51,22 @@ export function parseSearchQuery(query: string): SearchTerm[] {
 export function matchesSearchTerms(play: Play, terms: SearchTerm[]): boolean {
   // Pre-normalize fields for efficiency
   const normalizedTrack = play.master_metadata_track_name?.toLowerCase() || "";
-  const normalizedArtist = play.master_metadata_album_artist_name?.toLowerCase() || "";
-  const normalizedAlbum = play.master_metadata_album_album_name?.toLowerCase() || "";
+  const normalizedArtist =
+    play.master_metadata_album_artist_name?.toLowerCase() || "";
+  const normalizedAlbum =
+    play.master_metadata_album_album_name?.toLowerCase() || "";
   const normalizedAll = `${normalizedTrack} ${normalizedArtist} ${normalizedAlbum}`;
 
   for (const term of terms) {
-    if (!matchesSingleTerm(term, normalizedTrack, normalizedArtist, normalizedAlbum, normalizedAll)) {
+    if (
+      !matchesSingleTerm(
+        term,
+        normalizedTrack,
+        normalizedArtist,
+        normalizedAlbum,
+        normalizedAll,
+      )
+    ) {
       return false;
     }
   }
@@ -71,7 +81,7 @@ function matchesSingleTerm(
   normalizedTrack: string,
   normalizedArtist: string,
   normalizedAlbum: string,
-  normalizedAll: string
+  normalizedAll: string,
 ): boolean {
   switch (term.type) {
     case "track":
@@ -109,7 +119,7 @@ function matchesField(term: SearchTerm, fieldValue: string): boolean {
 function matchesExact(value: string, text: string): boolean {
   const regex = new RegExp(
     `\\b${value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-    "i"
+    "i",
   );
   return regex.test(text);
 }

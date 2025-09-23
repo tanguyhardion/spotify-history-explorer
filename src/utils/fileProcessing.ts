@@ -1,5 +1,10 @@
 import JSZip from "jszip";
-import type { RawSpotifyData, Play, FileValidationResult, UploadedFile } from "../types";
+import type {
+  RawSpotifyData,
+  Play,
+  FileValidationResult,
+  UploadedFile,
+} from "../types";
 import { APP_CONFIG } from "../constants/app";
 
 /**
@@ -9,7 +14,7 @@ export function validateFiles(files: FileList): FileValidationResult {
   if (files.length === 0) {
     return {
       isValid: false,
-      errorMessage: "Please select at least one JSON or ZIP file"
+      errorMessage: "Please select at least one JSON or ZIP file",
     };
   }
 
@@ -29,12 +34,13 @@ export function validateFiles(files: FileList): FileValidationResult {
  */
 function validateSingleFile(file: File): FileValidationResult {
   const isJson = file.type.includes("json");
-  const isZip = file.type.includes("zip") || file.name.toLowerCase().endsWith('.zip');
+  const isZip =
+    file.type.includes("zip") || file.name.toLowerCase().endsWith(".zip");
 
   if (!isJson && !isZip) {
     return {
       isValid: false,
-      errorMessage: `File "${file.name}" is not a valid JSON or ZIP file`
+      errorMessage: `File "${file.name}" is not a valid JSON or ZIP file`,
     };
   }
 
@@ -42,7 +48,7 @@ function validateSingleFile(file: File): FileValidationResult {
     const maxSizeMB = APP_CONFIG.maxFileSize / (1024 * 1024);
     return {
       isValid: false,
-      errorMessage: `File "${file.name}" is too large. Maximum size is ${maxSizeMB}MB per file`
+      errorMessage: `File "${file.name}" is too large. Maximum size is ${maxSizeMB}MB per file`,
     };
   }
 
@@ -60,20 +66,20 @@ export async function extractJsonFromZip(zipFile: File): Promise<string[]> {
     for (const [filename, file] of Object.entries(zip.files)) {
       // Check if file is inside "Spotify Extended Streaming History" folder and matches the pattern
       if (
-        filename.startsWith('Spotify Extended Streaming History/') && 
-        filename.includes('Streaming_History_Audio_') && 
-        filename.endsWith('.json')
+        filename.startsWith("Spotify Extended Streaming History/") &&
+        filename.includes("Streaming_History_Audio_") &&
+        filename.endsWith(".json")
       ) {
-        const content = await file.async('text');
+        const content = await file.async("text");
         jsonContents.push(content);
       }
     }
 
     if (jsonContents.length === 0) {
       throw new Error(
-        'No valid Spotify streaming history files found in the ZIP. ' +
-        'Files should be inside a "Spotify Extended Streaming History" folder ' +
-        'and start with "Streaming_History_Audio_".'
+        "No valid Spotify streaming history files found in the ZIP. " +
+          'Files should be inside a "Spotify Extended Streaming History" folder ' +
+          'and start with "Streaming_History_Audio_".',
       );
     }
 
@@ -91,7 +97,9 @@ export async function extractJsonFromZip(zipFile: File): Promise<string[]> {
  */
 export function parseSpotifyData(jsonData: RawSpotifyData[]): Play[] {
   if (!Array.isArray(jsonData)) {
-    throw new Error("Invalid file format. Expected an array of listening history.");
+    throw new Error(
+      "Invalid file format. Expected an array of listening history.",
+    );
   }
 
   return jsonData.map((item, index) => {
@@ -101,11 +109,15 @@ export function parseSpotifyData(jsonData: RawSpotifyData[]): Play[] {
         ms_played: Number(item.ms_played ?? 0),
         spotify_track_uri: item.spotify_track_uri ?? null,
         master_metadata_track_name: item.master_metadata_track_name ?? null,
-        master_metadata_album_artist_name: item.master_metadata_album_artist_name ?? null,
-        master_metadata_album_album_name: item.master_metadata_album_album_name ?? null,
+        master_metadata_album_artist_name:
+          item.master_metadata_album_artist_name ?? null,
+        master_metadata_album_album_name:
+          item.master_metadata_album_album_name ?? null,
       };
     } catch (error) {
-      throw new Error(`Invalid data format at index ${index}: ${String(error)}`);
+      throw new Error(
+        `Invalid data format at index ${index}: ${String(error)}`,
+      );
     }
   });
 }
@@ -126,7 +138,7 @@ export async function processFiles(files: FileList): Promise<Play[]> {
     const file = files[i];
     let jsonContents: string[] = [];
 
-    if (file.type.includes("zip") || file.name.toLowerCase().endsWith('.zip')) {
+    if (file.type.includes("zip") || file.name.toLowerCase().endsWith(".zip")) {
       // Handle ZIP file
       jsonContents = await extractJsonFromZip(file);
     } else {
@@ -143,7 +155,7 @@ export async function processFiles(files: FileList): Promise<Play[]> {
         allPlays = allPlays.concat(plays);
       } catch (error) {
         throw new Error(
-          `Failed to parse JSON in "${file.name}": ${error instanceof Error ? error.message : String(error)}`
+          `Failed to parse JSON in "${file.name}": ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

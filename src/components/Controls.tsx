@@ -13,15 +13,21 @@ interface ControlsProps {
  * Supports field-specific searches and exact phrase matching
  */
 function Controls({ query, setQuery, total, filteredCount }: ControlsProps) {
-  const handleQueryChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-  }, [setQuery]);
+  const handleQueryChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(event.target.value);
+    },
+    [setQuery],
+  );
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Escape") {
-      setQuery("");
-    }
-  }, [setQuery]);
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Escape") {
+        setQuery("");
+      }
+    },
+    [setQuery],
+  );
 
   const handleClearClick = useCallback(() => {
     setQuery("");
@@ -54,7 +60,12 @@ interface SearchFieldProps {
   onClear: () => void;
 }
 
-function SearchField({ query, onChange, onKeyDown, onClear }: SearchFieldProps) {
+function SearchField({
+  query,
+  onChange,
+  onKeyDown,
+  onClear,
+}: SearchFieldProps) {
   return (
     <div className="relative">
       <Input
@@ -66,13 +77,13 @@ function SearchField({ query, onChange, onKeyDown, onClear }: SearchFieldProps) 
         className="w-full sm:w-[40rem] max-w-full pl-10 pr-10"
         aria-label="Search your music history"
       />
-      
-      <SearchIcon 
+
+      <SearchIcon
         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
         size="sm"
         aria-hidden={true}
       />
-      
+
       {query && (
         <Button
           variant="ghost"
@@ -93,7 +104,11 @@ interface PlayCountDisplayProps {
   filteredCount: number;
 }
 
-function PlayCountDisplay({ query, total, filteredCount }: PlayCountDisplayProps) {
+function PlayCountDisplay({
+  query,
+  total,
+  filteredCount,
+}: PlayCountDisplayProps) {
   return (
     <div className="flex items-center gap-3 text-sm">
       <span className="text-gray-300">

@@ -24,14 +24,15 @@ export function useSpotifyData(): UseSpotifyDataReturn {
     try {
       setError(null);
       setIsLoading(true);
-      
+
       const plays = await SpotifyDataService.loadData();
       setData(plays);
     } catch (err) {
       console.error("Failed to load data:", err);
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Failed to load your saved listening history";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to load your saved listening history";
       setError(errorMessage);
       setData([]);
     } finally {

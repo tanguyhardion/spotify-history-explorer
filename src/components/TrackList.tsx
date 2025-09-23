@@ -8,6 +8,7 @@ interface TrackListProps {
   data: Play[];
   sort: SortState;
   onSort: (key: SortKey) => void;
+  isSorting?: boolean;
 }
 
 const COLUMNS = [
@@ -47,17 +48,11 @@ const COLUMNS = [
  * Virtualized track list component for optimal performance with large datasets
  * Features sortable columns and responsive design
  */
-function TrackList({ data, sort, onSort }: TrackListProps) {
+function TrackList({ data, sort, onSort, isSorting = false }: TrackListProps) {
   const itemContent = useCallback(
     (index: number) => {
       const play = data[index];
-      return (
-        <TrackRow
-          key={`${play.ts}-${index}`}
-          play={play}
-          index={index}
-        />
-      );
+      return <TrackRow key={`${play.ts}-${index}`} play={play} index={index} />;
     },
     [data],
   );
@@ -73,7 +68,15 @@ function TrackList({ data, sort, onSort }: TrackListProps) {
       className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden flex flex-col"
     >
       <TrackHeader sort={sort} onSort={onSort} />
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 relative">
+        {isSorting && (
+          <div className="absolute inset-0 bg-gray-800/50 backdrop-blur-sm z-20 flex items-center justify-center">
+            <div className="bg-gray-700 px-4 py-2 rounded-lg border border-gray-600 flex items-center gap-2">
+              <div className="animate-spin w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full"></div>
+              <span className="text-sm text-gray-200">Sorting...</span>
+            </div>
+          </div>
+        )}
         <Virtuoso data={data} itemContent={itemContent} className="h-full" />
       </div>
     </div>
@@ -117,9 +120,16 @@ interface HeaderColumnProps {
   onClick: (key: SortKey) => void;
 }
 
-function HeaderColumn({ sortKey, label, span, sort, onClick }: HeaderColumnProps) {
-  const isHiddenOnMobile = sortKey === "master_metadata_album_artist_name" || 
-                           sortKey === "master_metadata_album_album_name";
+function HeaderColumn({
+  sortKey,
+  label,
+  span,
+  sort,
+  onClick,
+}: HeaderColumnProps) {
+  const isHiddenOnMobile =
+    sortKey === "master_metadata_album_artist_name" ||
+    sortKey === "master_metadata_album_album_name";
 
   return (
     <button
@@ -173,10 +183,7 @@ interface TimeCellProps {
 
 function TimeCell({ time }: TimeCellProps) {
   return (
-    <div
-      className="col-span-4 sm:col-span-3 text-gray-300"
-      title={time}
-    >
+    <div className="col-span-4 sm:col-span-3 text-gray-300" title={time}>
       {time}
     </div>
   );

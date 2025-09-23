@@ -24,7 +24,13 @@ interface StatCardProps extends BaseComponentProps {
   tooltip?: string;
 }
 
-export function StatCard({ label, value, tooltip, className = "", ...props }: StatCardProps) {
+export function StatCard({
+  label,
+  value,
+  tooltip,
+  className = "",
+  ...props
+}: StatCardProps) {
   return (
     <Card className={className} {...props}>
       <div className="text-xs text-gray-400 mb-1">{label}</div>

@@ -32,29 +32,6 @@ function Stats({ data }: StatsProps) {
       value: stats.averagePlaytime,
     },
     {
-      label: "Average Plays/Day",
-      value: stats.averagePlaysPerDay.toFixed(1),
-    },
-    {
-      label: "Listening Streak",
-      value: `${stats.listeningStreak} days`,
-    },
-    {
-      label: "Most Active Day",
-      value: stats.mostActiveDayOfWeek.day,
-      tooltip: `${stats.mostActiveDayOfWeek.plays} plays`,
-    },
-    {
-      label: "Most Active Hour",
-      value: stats.mostActiveHour.hour >= 0 ? `${stats.mostActiveHour.hour}:00` : "—",
-      tooltip: `${stats.mostActiveHour.plays} plays`,
-    },
-    {
-      label: "Most Active Date",
-      value: stats.mostActiveDayEver.date,
-      tooltip: `${stats.mostActiveDayEver.plays} plays`,
-    },
-    {
       label: "Most Played Artist",
       value: stats.topArtist.name,
       tooltip: `${stats.topArtist.plays} plays`,

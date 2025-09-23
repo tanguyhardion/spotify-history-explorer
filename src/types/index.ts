@@ -10,14 +10,14 @@ export type {
   SortDirection,
   SortState,
   SearchTerm,
-  PlayStatistics
+  PlayStatistics,
 } from "./spotify";
 
 export type {
   FileUploadVariant,
   FileValidationResult,
   FileProcessingState,
-  UploadedFile
+  UploadedFile,
 } from "./upload";
 
 export type {
@@ -26,5 +26,5 @@ export type {
   NonEmptyArray,
   BaseComponentProps,
   LoadingState,
-  PaginationState
+  PaginationState,
 } from "./common";

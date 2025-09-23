@@ -13,6 +13,7 @@ interface MainLayoutProps {
   sort: SortState;
   onSort: (key: SortKey) => void;
   onDataUpload: (data: Play[]) => void;
+  isSorting?: boolean;
 }
 
 export function MainLayout({
@@ -23,6 +24,7 @@ export function MainLayout({
   sort,
   onSort,
   onDataUpload,
+  isSorting = false,
 }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 dark">
@@ -40,7 +42,12 @@ export function MainLayout({
             total={data.length}
             filteredCount={filteredData.length}
           />
-          <TrackList data={filteredData} sort={sort} onSort={onSort} />
+          <TrackList
+            data={filteredData}
+            sort={sort}
+            onSort={onSort}
+            isSorting={isSorting}
+          />
         </div>
 
         <footer className="text-center">

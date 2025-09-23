@@ -16,7 +16,8 @@ const variantClasses = {
   primary: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
   secondary: "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500",
   danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-  ghost: "text-gray-400 hover:text-gray-200 hover:bg-gray-700 focus:ring-gray-500",
+  ghost:
+    "text-gray-400 hover:text-gray-200 hover:bg-gray-700 focus:ring-gray-500",
 };
 
 const sizeClasses = {
@@ -26,17 +27,20 @@ const sizeClasses = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({
-    variant = "primary",
-    size = "md",
-    disabled = false,
-    isLoading = false,
-    children,
-    onClick,
-    type = "button",
-    className = "",
-    ...props
-  }, ref) => {
+  (
+    {
+      variant = "primary",
+      size = "md",
+      disabled = false,
+      isLoading = false,
+      children,
+      onClick,
+      type = "button",
+      className = "",
+      ...props
+    },
+    ref,
+  ) => {
     const isDisabled = disabled || isLoading;
 
     return (
@@ -59,7 +63,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {children}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

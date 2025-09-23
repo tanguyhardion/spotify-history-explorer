@@ -14,16 +14,19 @@ interface InputProps extends BaseComponentProps {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({
-    type = "text",
-    placeholder,
-    value,
-    onChange,
-    onKeyDown,
-    disabled = false,
-    className = "",
-    ...props
-  }, ref) => {
+  (
+    {
+      type = "text",
+      placeholder,
+      value,
+      onChange,
+      onKeyDown,
+      disabled = false,
+      className = "",
+      ...props
+    },
+    ref,
+  ) => {
     return (
       <input
         ref={ref}
@@ -46,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Input.displayName = "Input";

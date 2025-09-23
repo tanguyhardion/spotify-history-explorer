@@ -45,9 +45,10 @@ export default function FileUpload({
         onData(allPlays);
       } catch (err) {
         console.error("File processing error:", err);
-        const errorMessage = err instanceof Error
-          ? err.message
-          : "Failed to parse files. Please ensure they are valid Spotify JSON or ZIP files.";
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Failed to parse files. Please ensure they are valid Spotify JSON or ZIP files.";
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -150,7 +151,7 @@ function ProminentUpload({
         />
         <div
           className={`group cursor-pointer ${
-            isDragOver ? 'border-green-400 bg-green-800/50' : ''
+            isDragOver ? "border-green-400 bg-green-800/50" : ""
           }`}
           {...onDragHandlers}
         >
@@ -170,7 +171,8 @@ function ProminentUpload({
                     : "Upload Spotify JSON or ZIP File"}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Click to select your downloaded Spotify data files (JSON or ZIP)
+                  Click to select your downloaded Spotify data files (JSON or
+                  ZIP)
                 </p>
               </div>
             </div>
@@ -203,7 +205,7 @@ function HeaderUpload({
           bg-green-600 text-white hover:bg-green-700 cursor-pointer 
           text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed 
           transition-colors
-          ${isDragOver ? 'bg-green-500' : ''}
+          ${isDragOver ? "bg-green-500" : ""}
         `}
         {...onDragHandlers}
       >

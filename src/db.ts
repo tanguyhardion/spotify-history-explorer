@@ -59,8 +59,8 @@ export async function addPlaysBulk(plays: Play[]): Promise<void> {
     const db = await getDB();
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.store;
-    
-    const promises = plays.map(play => store.add(play));
+
+    const promises = plays.map((play) => store.add(play));
     await Promise.all(promises);
     await tx.done;
   } catch (error) {

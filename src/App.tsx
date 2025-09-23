@@ -14,7 +14,11 @@ function AppContent() {
   const { query, setQuery, clearQuery, debouncedQuery } = useSearch();
   const { sort, changeSort } = useSort();
 
-  const filteredData = useFilteredData({ data, query: debouncedQuery, sort });
+  const { filteredData, isLoading: isSorting } = useFilteredData({
+    data,
+    query: debouncedQuery,
+    sort,
+  });
 
   const handleDataUpload = useCallback(
     (newData: Play[]) => {
@@ -62,6 +66,7 @@ function AppContent() {
       sort={sort}
       onSort={changeSort}
       onDataUpload={handleDataUpload}
+      isSorting={isSorting}
     />
   );
 }

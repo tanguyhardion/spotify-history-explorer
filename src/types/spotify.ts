@@ -38,20 +38,6 @@ export interface PlayStatistics {
   uniqueTracks: number;
   uniqueArtists: number;
   averagePlaytime: string;
-  averagePlaysPerDay: number;
-  listeningStreak: number;
-  mostActiveDayOfWeek: {
-    day: string;
-    plays: number;
-  };
-  mostActiveHour: {
-    hour: number;
-    plays: number;
-  };
-  mostActiveDayEver: {
-    date: string;
-    plays: number;
-  };
   topArtist: {
     name: string;
     plays: number;

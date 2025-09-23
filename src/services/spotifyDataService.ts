@@ -29,7 +29,7 @@ export class SpotifyDataService {
       if (await hasData()) {
         const plays = await getAllPlays();
         // Sort by timestamp descending by default
-        return plays.sort((a, b) => a.ts > b.ts ? -1 : a.ts < b.ts ? 1 : 0);
+        return plays.sort((a, b) => (a.ts > b.ts ? -1 : a.ts < b.ts ? 1 : 0));
       }
       return [];
     } catch (error) {
@@ -67,7 +67,7 @@ export class SpotifyDataService {
    */
   private static async saveToDatabase(plays: Play[]): Promise<void> {
     await clearPlays();
-    
+
     const CHUNK_SIZE = 2000;
     for (let i = 0; i < plays.length; i += CHUNK_SIZE) {
       const chunk = plays.slice(i, i + CHUNK_SIZE);

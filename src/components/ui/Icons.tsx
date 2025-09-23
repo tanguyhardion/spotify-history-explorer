@@ -7,11 +7,15 @@ interface IconProps extends BaseComponentProps {
 
 const sizeClasses = {
   sm: "w-4 h-4",
-  md: "w-6 h-6", 
+  md: "w-6 h-6",
   lg: "w-8 h-8",
 };
 
-export function SearchIcon({ size = "md", className = "", ...props }: IconProps) {
+export function SearchIcon({
+  size = "md",
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
@@ -30,7 +34,11 @@ export function SearchIcon({ size = "md", className = "", ...props }: IconProps)
   );
 }
 
-export function CloseIcon({ size = "md", className = "", ...props }: IconProps) {
+export function CloseIcon({
+  size = "md",
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
@@ -49,7 +57,11 @@ export function CloseIcon({ size = "md", className = "", ...props }: IconProps) 
   );
 }
 
-export function UploadIcon({ size = "md", className = "", ...props }: IconProps) {
+export function UploadIcon({
+  size = "md",
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
@@ -68,7 +80,11 @@ export function UploadIcon({ size = "md", className = "", ...props }: IconProps)
   );
 }
 
-export function MusicIcon({ size = "md", className = "", ...props }: IconProps) {
+export function MusicIcon({
+  size = "md",
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
@@ -87,7 +103,11 @@ export function MusicIcon({ size = "md", className = "", ...props }: IconProps) 
   );
 }
 
-export function ErrorIcon({ size = "md", className = "", ...props }: IconProps) {
+export function ErrorIcon({
+  size = "md",
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       className={`${sizeClasses[size]} ${className}`}
