@@ -76,6 +76,75 @@ function useStatsData(data: Play[]) {
 
     const averagePlaytime = data.length > 0 ? totalMs / data.length : 0;
 
+    // Calculate activity stats
+    const dayOfWeekCounts = new Map<string, number>();
+    const hourCounts = new Map<number, number>();
+    const dateCounts = new Map<string, number>();
+    const uniqueDays = new Set<string>();
+
+    for (const play of data) {
+      const date = new Date(play.ts);
+      const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const hour = date.getHours();
+      const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      dayOfWeekCounts.set(dayOfWeek, (dayOfWeekCounts.get(dayOfWeek) || 0) + 1);
+      hourCounts.set(hour, (hourCounts.get(hour) || 0) + 1);
+      dateCounts.set(dateStr, (dateCounts.get(dateStr) || 0) + 1);
+      uniqueDays.add(dateStr);
+    }
+
+    // Most active day of week
+    let mostActiveDayOfWeek = { day: "—", plays: 0 };
+    for (const [day, plays] of dayOfWeekCounts) {
+      if (plays > mostActiveDayOfWeek.plays) {
+        mostActiveDayOfWeek = { day, plays };
+      }
+    }
+
+    // Most active hour
+    let mostActiveHour = { hour: -1, plays: 0 };
+    for (const [hour, plays] of hourCounts) {
+      if (plays > mostActiveHour.plays) {
+        mostActiveHour = { hour, plays };
+      }
+    }
+
+    // Most active day ever
+    let mostActiveDayEver = { date: "—", plays: 0 };
+    for (const [date, plays] of dateCounts) {
+      if (plays > mostActiveDayEver.plays) {
+        mostActiveDayEver = { date, plays };
+      }
+    }
+
+    // Average plays per day
+    const averagePlaysPerDay = uniqueDays.size > 0 ? data.length / uniqueDays.size : 0;
+
+    // Listening streak
+    const sortedDates = Array.from(uniqueDays).sort();
+    let currentStreak = 0;
+    let maxStreak = 0;
+    let prevDate: Date | null = null;
+
+    for (const dateStr of sortedDates) {
+      const currentDate = new Date(dateStr);
+      if (prevDate) {
+        const diffTime = currentDate.getTime() - prevDate.getTime();
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays === 1) {
+          currentStreak++;
+        } else {
+          maxStreak = Math.max(maxStreak, currentStreak);
+          currentStreak = 1;
+        }
+      } else {
+        currentStreak = 1;
+      }
+      prevDate = currentDate;
+    }
+    maxStreak = Math.max(maxStreak, currentStreak);
+
     return {
       totalPlaytime: formatMs(totalMs),
       topArtist,
@@ -83,8 +152,12 @@ function useStatsData(data: Play[]) {
       topAlbum,
       uniqueTracks,
       uniqueArtists,
-      totalPlays: data.length,
       averagePlaytime: formatMs(averagePlaytime),
+      mostActiveDayOfWeek,
+      mostActiveHour,
+      mostActiveDayEver,
+      averagePlaysPerDay,
+      listeningStreak: maxStreak,
     };
   }, [data]);
 }
@@ -108,10 +181,6 @@ function Stats({ data }: StatsProps) {
 
   const statItems: StatItem[] = [
     {
-      label: "Total Plays",
-      value: stats.totalPlays.toLocaleString(),
-    },
-    {
       label: "Total Playtime",
       value: stats.totalPlaytime,
     },
@@ -122,6 +191,33 @@ function Stats({ data }: StatsProps) {
     {
       label: "Unique Tracks",
       value: stats.uniqueTracks.toLocaleString(),
+    },
+    {
+      label: "Average Playtime",
+      value: stats.averagePlaytime,
+    },
+    {
+      label: "Average Plays/Day",
+      value: stats.averagePlaysPerDay.toFixed(1),
+    },
+    {
+      label: "Listening Streak",
+      value: `${stats.listeningStreak} days`,
+    },
+    {
+      label: "Most Active Day",
+      value: stats.mostActiveDayOfWeek.day,
+      tooltip: `${stats.mostActiveDayOfWeek.plays} plays`,
+    },
+    {
+      label: "Most Active Hour",
+      value: stats.mostActiveHour.hour >= 0 ? `${stats.mostActiveHour.hour}:00` : "—",
+      tooltip: `${stats.mostActiveHour.plays} plays`,
+    },
+    {
+      label: "Most Active Date",
+      value: stats.mostActiveDayEver.date,
+      tooltip: `${stats.mostActiveDayEver.plays} plays`,
     },
     {
       label: "Most Played Artist",
@@ -138,14 +234,10 @@ function Stats({ data }: StatsProps) {
       value: `${stats.topAlbum.name}`,
       tooltip: stats.topAlbum.name,
     },
-    {
-      label: "Avg Playtime",
-      value: stats.averagePlaytime,
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
       {statItems.map((stat, index) => (
         <StatCard
           key={index}

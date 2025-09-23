@@ -15,11 +15,7 @@ export function LoadingSpinner({
 
   return (
     <div className={`${sizeClasses[size]} ${className}`}>
-      <svg
-        className="animate-spin text-white"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
+      <svg className="animate-spin text-white" fill="none" viewBox="0 0 24 24">
         <circle
           className="opacity-30"
           cx="12"

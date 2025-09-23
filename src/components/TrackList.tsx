@@ -21,7 +21,12 @@ interface TrackRowProps {
 }
 
 const COLUMNS = [
-  { key: "ts" as const, label: "Time", span: "col-span-4 sm:col-span-3", mobileSpan: "col-span-6" },
+  {
+    key: "ts" as const,
+    label: "Time",
+    span: "col-span-4 sm:col-span-3",
+    mobileSpan: "col-span-6",
+  },
   {
     key: "master_metadata_track_name" as const,
     label: "Track",
@@ -40,7 +45,12 @@ const COLUMNS = [
     span: "col-span-2 sm:col-span-3",
     mobileSpan: "hidden",
   },
-  { key: "ms_played" as const, label: "Played", span: "col-span-1 text-right", mobileSpan: "col-span-6 text-right" },
+  {
+    key: "ms_played" as const,
+    label: "Played",
+    span: "col-span-1 text-right",
+    mobileSpan: "col-span-6 text-right",
+  },
 ] as const;
 
 function getSortIcon(sortKey: SortKey, currentSort: SortState): string {
@@ -58,7 +68,7 @@ function TrackHeader({ sort, onSort }: HeaderProps) {
     (key: SortKey) => {
       onSort(key);
     },
-    [onSort]
+    [onSort],
   );
 
   return (
@@ -67,7 +77,7 @@ function TrackHeader({ sort, onSort }: HeaderProps) {
         <button
           key={key}
           type="button"
-          className={`${span} ${key === 'master_metadata_album_artist_name' || key === 'master_metadata_album_album_name' ? 'hidden sm:block' : ''} cursor-pointer hover:text-gray-300 transition-colors select-none text-left focus:outline-none focus:text-gray-300`}
+          className={`${span} ${key === "master_metadata_album_artist_name" || key === "master_metadata_album_album_name" ? "hidden sm:block" : ""} cursor-pointer hover:text-gray-300 transition-colors select-none text-left focus:outline-none focus:text-gray-300`}
           onClick={() => handleColumnClick(key)}
           aria-label={`Sort by ${label}`}
         >
@@ -93,7 +103,10 @@ function TrackRow({ play, index }: TrackRowProps) {
       role="row"
       aria-rowindex={index + 2} // +2 because header is row 1
     >
-      <div className="col-span-4 sm:col-span-3 text-gray-300" title={formattedTime}>
+      <div
+        className="col-span-4 sm:col-span-3 text-gray-300"
+        title={formattedTime}
+      >
         {formattedTime}
       </div>
 
@@ -116,11 +129,17 @@ function TrackRow({ play, index }: TrackRowProps) {
         )}
       </div>
 
-      <div className="hidden sm:block col-span-2 truncate text-gray-200" title={artistName}>
+      <div
+        className="hidden sm:block col-span-2 truncate text-gray-200"
+        title={artistName}
+      >
         {artistName}
       </div>
 
-      <div className="hidden sm:block col-span-3 truncate text-gray-200" title={albumName}>
+      <div
+        className="hidden sm:block col-span-3 truncate text-gray-200"
+        title={albumName}
+      >
         {albumName}
       </div>
 
@@ -145,7 +164,7 @@ function TrackList({ data, sort, onSort }: TrackListProps) {
         />
       );
     },
-    [data]
+    [data],
   );
 
   if (data.length === 0) {
@@ -167,11 +186,7 @@ function TrackList({ data, sort, onSort }: TrackListProps) {
     >
       <TrackHeader sort={sort} onSort={onSort} />
       <div className="flex-1 min-h-0">
-        <Virtuoso
-          data={data}
-          itemContent={itemContent}
-          className="h-full"
-        />
+        <Virtuoso data={data} itemContent={itemContent} className="h-full" />
       </div>
     </div>
   );

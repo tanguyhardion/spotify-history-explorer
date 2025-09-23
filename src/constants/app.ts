@@ -20,4 +20,5 @@ export const DEFAULT_SORT_STATE = {
 
 export const SUPPORTED_FILE_TYPES = {
   json: "application/json",
+  zip: "application/zip",
 } as const;

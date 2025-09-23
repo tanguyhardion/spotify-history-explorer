@@ -33,7 +33,7 @@ export function EmptyState({ onUpload }: EmptyStateProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
                 />
               </svg>
             </div>
@@ -86,11 +86,11 @@ function DataInstructions() {
     },
     {
       number: 5,
-      text: "Download and unzip the file to extract the JSON files",
+      text: "Download the ZIP file from Spotify",
     },
     {
       number: 6,
-      text: "Upload all the Streaming_History_Audio_*.json files (select multiple files at once)",
+      text: "Upload the ZIP file directly, or unzip it and upload the Streaming_History_Audio_*.json files",
     },
   ];
 

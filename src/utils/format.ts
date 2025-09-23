@@ -28,7 +28,7 @@ export function formatMs(ms: number): string {
   if (minutes > 0) parts.push(`${minutes}m`);
   if (seconds > 0) parts.push(`${seconds}s`);
 
-  return parts.length > 0 ? parts.join(' ') : '0s';
+  return parts.length > 0 ? parts.join(" ") : "0s";
 }
 
 /**

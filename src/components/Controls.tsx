@@ -7,12 +7,7 @@ interface ControlsProps {
   filteredCount: number;
 }
 
-function Controls({
-  query,
-  setQuery,
-  total,
-  filteredCount,
-}: ControlsProps) {
+function Controls({ query, setQuery, total, filteredCount }: ControlsProps) {
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
   };
