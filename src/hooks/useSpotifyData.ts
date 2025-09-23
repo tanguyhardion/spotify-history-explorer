@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getAllPlays, countPlays } from "../db";
+import { SpotifyDataService } from "../services";
 import type { Play } from "../types";
 
 interface UseSpotifyDataReturn {
@@ -8,8 +8,13 @@ interface UseSpotifyDataReturn {
   error: string | null;
   setData: (data: Play[]) => void;
   clearError: () => void;
+  refetchData: () => Promise<void>;
 }
 
+/**
+ * Custom hook for managing Spotify data from IndexedDB
+ * Provides loading state, error handling, and data management
+ */
 export function useSpotifyData(): UseSpotifyDataReturn {
   const [data, setData] = useState<Play[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,19 +23,17 @@ export function useSpotifyData(): UseSpotifyDataReturn {
   const loadData = useCallback(async () => {
     try {
       setError(null);
-      const count = await countPlays();
-
-      if (count > 0) {
-        const plays = await getAllPlays();
-        // Sort by timestamp descending by default
-        const sortedPlays = plays.sort((a, b) =>
-          a.ts > b.ts ? -1 : a.ts < b.ts ? 1 : 0,
-        );
-        setData(sortedPlays);
-      }
+      setIsLoading(true);
+      
+      const plays = await SpotifyDataService.loadData();
+      setData(plays);
     } catch (err) {
-      console.error("Failed to load data from IndexedDB:", err);
-      setError("Failed to load your saved listening history");
+      console.error("Failed to load data:", err);
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : "Failed to load your saved listening history";
+      setError(errorMessage);
+      setData([]);
     } finally {
       setIsLoading(false);
     }
@@ -45,6 +48,10 @@ export function useSpotifyData(): UseSpotifyDataReturn {
     setError(null);
   }, []);
 
+  const refetchData = useCallback(async () => {
+    await loadData();
+  }, [loadData]);
+
   useEffect(() => {
     loadData();
   }, [loadData]);
@@ -55,5 +62,6 @@ export function useSpotifyData(): UseSpotifyDataReturn {
     error,
     setData: handleSetData,
     clearError,
+    refetchData,
   };
 }
