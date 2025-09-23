@@ -30,6 +30,34 @@ function useStatsData(data: Play[]) {
       }
     }
 
+    // Calculate top track
+    const trackPlayCounts = new Map<string, number>();
+    for (const play of data) {
+      const track = play.master_metadata_track_name || "Unknown";
+      trackPlayCounts.set(track, (trackPlayCounts.get(track) || 0) + 1);
+    }
+
+    let topTrack = { name: "—", plays: 0 };
+    for (const [trackName, playCount] of trackPlayCounts) {
+      if (playCount > topTrack.plays) {
+        topTrack = { name: trackName, plays: playCount };
+      }
+    }
+
+    // Calculate top album
+    const albumPlayCounts = new Map<string, number>();
+    for (const play of data) {
+      const album = play.master_metadata_album_album_name || "Unknown";
+      albumPlayCounts.set(album, (albumPlayCounts.get(album) || 0) + 1);
+    }
+
+    let topAlbum = { name: "—", plays: 0 };
+    for (const [albumName, playCount] of albumPlayCounts) {
+      if (playCount > topAlbum.plays) {
+        topAlbum = { name: albumName, plays: playCount };
+      }
+    }
+
     // Calculate additional stats
     const uniqueTracks = new Set(
       data
@@ -46,12 +74,17 @@ function useStatsData(data: Play[]) {
         .map((play) => play.master_metadata_album_artist_name),
     ).size;
 
+    const averagePlaytime = data.length > 0 ? totalMs / data.length : 0;
+
     return {
       totalPlaytime: formatMs(totalMs),
       topArtist,
+      topTrack,
+      topAlbum,
       uniqueTracks,
       uniqueArtists,
       totalPlays: data.length,
+      averagePlaytime: formatMs(averagePlaytime),
     };
   }, [data]);
 }
@@ -75,26 +108,44 @@ function Stats({ data }: StatsProps) {
 
   const statItems: StatItem[] = [
     {
+      label: "Total Plays",
+      value: stats.totalPlays.toLocaleString(),
+    },
+    {
       label: "Total Playtime",
       value: stats.totalPlaytime,
     },
     {
-      label: "Most Played Artist (by plays)",
-      value: `${stats.topArtist.name}`,
-      tooltip: stats.topArtist.name,
+      label: "Unique Artists",
+      value: stats.uniqueArtists.toLocaleString(),
     },
     {
       label: "Unique Tracks",
       value: stats.uniqueTracks.toLocaleString(),
     },
     {
-      label: "Unique Artists",
-      value: stats.uniqueArtists.toLocaleString(),
+      label: "Most Played Artist",
+      value: `${stats.topArtist.name}`,
+      tooltip: stats.topArtist.name,
+    },
+    {
+      label: "Most Played Track",
+      value: `${stats.topTrack.name}`,
+      tooltip: stats.topTrack.name,
+    },
+    {
+      label: "Most Played Album",
+      value: `${stats.topAlbum.name}`,
+      tooltip: stats.topAlbum.name,
+    },
+    {
+      label: "Avg Playtime",
+      value: stats.averagePlaytime,
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {statItems.map((stat, index) => (
         <StatCard
           key={index}

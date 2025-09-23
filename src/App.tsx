@@ -11,10 +11,10 @@ import type { Play } from "./types";
 
 function AppContent() {
   const { data, isLoading, error, setData, clearError } = useSpotifyData();
-  const { query, setQuery, clearQuery } = useSearch();
+  const { query, setQuery, clearQuery, debouncedQuery } = useSearch();
   const { sort, changeSort } = useSort();
 
-  const filteredData = useFilteredData({ data, query, sort });
+  const filteredData = useFilteredData({ data, query: debouncedQuery, sort });
 
   const handleDataUpload = useCallback(
     (newData: Play[]) => {

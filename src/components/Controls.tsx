@@ -36,8 +36,8 @@ function Controls({
             value={query}
             onChange={handleQueryChange}
             onKeyDown={handleKeyDown}
-            placeholder="Search tracks, artists, albums…"
-            className="w-72 max-w-full px-3 py-2 pl-10 pr-10 border border-gray-600 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 backdrop-blur text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder='Search tracks, artists, albums… Use "exact phrase", track:name, artist:name, album:name'
+            className="w-[40rem] max-w-full px-3 py-2 pl-10 pr-10 border border-gray-600 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 backdrop-blur text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             aria-label="Search your music history"
           />
           <svg
