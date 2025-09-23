@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   name: "Spotify History Explorer",
   brandColor: "green-400",
-  maxFileSize: 50 * 1024 * 1024, // 50MB
+  maxFileSize: 50 * 1024 * 1024, // 50MB per file
   chunkSize: 2000,
   virtualListHeight: {
     mobile: "60vh",

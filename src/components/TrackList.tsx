@@ -161,13 +161,27 @@ function TrackList({ data, sort, onSort }: TrackListProps) {
       role="table"
       aria-label="Music listening history"
       className="h-[60vh] sm:h-[70vh] rounded-md border border-gray-700 overflow-hidden flex flex-col"
+      style={{ 
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y'
+      }}
     >
       <TrackHeader sort={sort} onSort={onSort} />
-      <div className="flex-1 min-h-0">
+      <div 
+        className="flex-1 min-h-0"
+        style={{ 
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y'
+        }}
+      >
         <Virtuoso
           data={data}
           itemContent={itemContent}
           className="h-full"
+          style={{ 
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y'
+          }}
         />
       </div>
     </div>

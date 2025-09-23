@@ -5,6 +5,11 @@ button:hover {
   cursor: pointer;
 }
 
+/* Prevent unwanted pan scrolling on the body */
+body {
+  overscroll-behavior: contain;
+}
+
 /* Custom scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
@@ -34,4 +39,10 @@ button:hover {
 html {
   scrollbar-width: thin;
   scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+}
+
+/* Ensure virtualized lists handle their own scrolling */
+[data-virtualized] {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }

@@ -86,7 +86,11 @@ function DataInstructions() {
     },
     {
       number: 5,
-      text: "Upload any of the JSON files from the download",
+      text: "Download and unzip the file to extract the JSON files",
+    },
+    {
+      number: 6,
+      text: "Upload all the Streaming_History_Audio_*.json files (select multiple files at once)",
     },
   ];
 

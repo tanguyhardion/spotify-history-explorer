@@ -18,13 +18,20 @@ export default function FileUpload({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const validateFile = useCallback((file: File): string | null => {
-    if (!file.type.includes("json")) {
-      return "Please select a valid JSON file";
+  const validateFiles = useCallback((files: FileList): string | null => {
+    if (files.length === 0) {
+      return "Please select at least one JSON file";
     }
 
-    if (file.size > APP_CONFIG.maxFileSize) {
-      return `File size too large. Maximum size is ${APP_CONFIG.maxFileSize / (1024 * 1024)}MB`;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.includes("json")) {
+        return `File "${file.name}" is not a valid JSON file`;
+      }
+
+      if (file.size > APP_CONFIG.maxFileSize) {
+        return `File "${file.name}" is too large. Maximum size is ${APP_CONFIG.maxFileSize / (1024 * 1024)}MB per file`;
+      }
     }
 
     return null;
@@ -55,10 +62,10 @@ export default function FileUpload({
 
   const handleFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
 
-      const validationError = validateFile(file);
+      const validationError = validateFiles(files);
       if (validationError) {
         setError(validationError);
         return;
@@ -68,32 +75,43 @@ export default function FileUpload({
       setError(null);
 
       try {
-        const text = await file.text();
-        const jsonData = JSON.parse(text);
+        let allPlays: Play[] = [];
 
-        if (!Array.isArray(jsonData)) {
-          throw new Error(
-            "Invalid file format. Expected an array of listening history.",
-          );
+        // Process each file and combine the data
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const text = await file.text();
+          const jsonData = JSON.parse(text);
+
+          if (!Array.isArray(jsonData)) {
+            throw new Error(
+              `Invalid file format in "${file.name}". Expected an array of listening history.`,
+            );
+          }
+
+          const plays = parseSpotifyData(jsonData);
+          allPlays = allPlays.concat(plays);
         }
 
-        const plays = parseSpotifyData(jsonData);
-        await saveToDatabase(plays);
-        onData(plays);
+        // Sort by timestamp to maintain chronological order
+        allPlays.sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+
+        await saveToDatabase(allPlays);
+        onData(allPlays);
       } catch (err) {
         console.error("File processing error:", err);
         const errorMessage =
           err instanceof Error
             ? err.message
-            : "Failed to parse file. Please ensure it's a valid Spotify JSON file.";
+            : "Failed to parse files. Please ensure they are valid Spotify JSON files.";
         setError(errorMessage);
       } finally {
         setIsLoading(false);
-        // Clear the input to allow re-uploading the same file
+        // Clear the input to allow re-uploading the same files
         event.target.value = "";
       }
     },
-    [validateFile, parseSpotifyData, saveToDatabase, onData],
+    [validateFiles, parseSpotifyData, saveToDatabase, onData],
   );
 
   if (variant === "prominent") {
@@ -106,7 +124,8 @@ export default function FileUpload({
             className="hidden"
             onChange={handleFileChange}
             disabled={isLoading}
-            aria-label="Upload Spotify JSON file"
+            multiple
+            aria-label="Upload Spotify JSON files"
           />
           <div className="group cursor-pointer">
             <div className="w-full p-6 border-2 border-dashed border-gray-600 rounded-xl bg-gray-800/50 hover:bg-gray-800 hover:border-green-500 transition-all duration-200">
@@ -134,10 +153,10 @@ export default function FileUpload({
                   <p className="text-lg font-semibold text-white">
                     {isLoading
                       ? "Importing your data..."
-                      : "Upload Spotify JSON"}
+                      : "Upload Spotify JSON Files"}
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Click to select your downloaded Spotify data file
+                    Click to select your downloaded Spotify data files
                   </p>
                 </div>
               </div>
@@ -163,6 +182,7 @@ export default function FileUpload({
           className="hidden"
           onChange={handleFileChange}
           disabled={isLoading}
+          multiple
           aria-label="Upload new Spotify data"
         />
         {isLoading ? (
