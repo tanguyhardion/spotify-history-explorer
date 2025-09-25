@@ -1,24 +1,7 @@
-export const APP_CONFIG = {
-  name: "Spotify History Explorer",
-  brandColor: "green-400",
-  maxFileSize: 50 * 1024 * 1024, // 50MB per file
-  chunkSize: 2000,
-  virtualListHeight: {
-    mobile: "60vh",
-    desktop: "70vh",
-  },
-} as const;
+export const APP_TITLE = 'Spotify History Explorer';
 
-export const SPOTIFY_URLS = {
-  privacy: "https://www.spotify.com/account/privacy/",
-} as const;
+export const ZIP_EXPECTED_FOLDER = 'Spotify Extended Streaming History';
+export const ZIP_FILE_PREFIX = 'Streaming_History_Audio_';
 
-export const DEFAULT_SORT_STATE = {
-  key: "ts" as const,
-  direction: "desc" as const,
-};
-
-export const SUPPORTED_FILE_TYPES = {
-  json: "application/json",
-  zip: "application/zip",
-} as const;
+export const FILE_ERROR_MESSAGE =
+  'We could not find any streaming history files. Please upload individual "StreamingHistory*.json" files or a ZIP containing "Spotify Extended Streaming History/Streaming_History_Audio_*.json" files.';

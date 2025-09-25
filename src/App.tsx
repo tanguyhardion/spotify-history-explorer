@@ -1,80 +1,117 @@
-import { useCallback } from "react";
-import "./index.css";
+import { useEffect, useMemo, useState } from 'react';
+import './index.css';
+import { AppHeader } from './components/layout/AppHeader';
+import { AppFooter } from './components/layout/AppFooter';
+import { MainLayout } from './components/layout/MainLayout';
+import { FileDropzone } from './components/upload/FileDropzone';
+import { ProgressOverlay } from './components/ui/ProgressOverlay';
+import { ErrorBanner } from './components/ui/ErrorBanner';
+import { DashboardPage } from './pages/DashboardPage';
+import { useFileProcessor } from './hooks/useFileProcessor';
+import type { PlayFilters } from './types/filters';
+import { buildCsvRowsFromPlays, buildOverviewStats, buildTimeline, getTopEntities } from './services/analytics';
+import { downloadCsv, downloadJson } from './utils/download';
 
-import { ErrorBoundary } from "./components/ui/ErrorBoundary";
-import { LoadingState } from "./components/ui/LoadingSpinner";
-import { EmptyState } from "./components/layout/EmptyState";
-import { MainLayout } from "./components/layout/MainLayout";
+const defaultFilters: PlayFilters = {
+  searchTerm: '',
+  artist: null,
+  track: null,
+  startDate: null,
+  endDate: null
+};
 
-import { useSpotifyData, useFilteredData, useSort, useSearch } from "./hooks";
-import type { Play } from "./types";
+function App() {
+  const processor = useFileProcessor();
+  const [filters, setFilters] = useState<PlayFilters>(defaultFilters);
+  const [timelineGrouping, setTimelineGrouping] = useState<'day' | 'week' | 'month'>('week');
 
-function AppContent() {
-  const { data, isLoading, error, setData, clearError } = useSpotifyData();
-  const { query, setQuery, clearQuery, debouncedQuery } = useSearch();
-  const { sort, changeSort } = useSort();
+  useEffect(() => {
+    if (processor.status === 'ready') {
+      setFilters(defaultFilters);
+    }
+  }, [processor.status]);
 
-  const { filteredData, isLoading: isSorting } = useFilteredData({
-    data,
-    query: debouncedQuery,
-    sort,
-  });
+  useEffect(() => {
+    if (processor.status === 'ready' && processor.plays.length) {
+      const first = processor.plays[0]?.timestamp.slice(0, 10) ?? null;
+      const last = processor.plays.at(-1)?.timestamp.slice(0, 10) ?? null;
+      setFilters((prev) => ({
+        ...prev,
+        startDate: first,
+        endDate: last
+      }));
+    }
+  }, [processor.status, processor.plays]);
 
-  const handleDataUpload = useCallback(
-    (newData: Play[]) => {
-      setData(newData);
-      // Clear any existing search when new data is uploaded
-      clearQuery();
-    },
-    [setData, clearQuery],
-  );
+  const showDashboard = processor.status === 'ready' && processor.plays.length > 0;
 
-  // Show loading state
-  if (isLoading) {
-    return <LoadingState message="Loading your music history..." />;
-  }
+  const exportSummary = useMemo(() => {
+    if (!processor.plays.length) return null;
+    const overview = buildOverviewStats(processor.plays);
+    const topTracks = getTopEntities(processor.plays, 'trackName');
+    const topArtists = getTopEntities(processor.plays, 'artistName');
+    const topAlbums = getTopEntities(processor.plays, 'albumName');
+    const timeline = buildTimeline(processor.plays, timelineGrouping);
 
-  // Show error state with retry option
-  if (error) {
-    return (
-      <LoadingState message="Error loading data">
-        <div className="space-y-4">
-          <p className="text-red-400 text-sm">{error}</p>
-          <button
-            onClick={clearError}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </LoadingState>
-    );
-  }
+    return { overview, topTracks, topArtists, topAlbums, timeline };
+  }, [processor.plays, timelineGrouping]);
 
-  // Show empty state when no data is available
-  if (data.length === 0) {
-    return <EmptyState onUpload={handleDataUpload} />;
-  }
+  const handleExportJson = () => {
+    if (!exportSummary) return;
+    downloadJson(exportSummary, 'spotify-history-summary.json');
+  };
 
-  // Show main application with data
+  const handleExportCsv = () => {
+    if (!processor.plays.length) return;
+    const rows = buildCsvRowsFromPlays(processor.plays);
+    downloadCsv(rows, 'spotify-history-plays.csv');
+  };
+
   return (
     <MainLayout
-      data={data}
-      filteredData={filteredData}
-      query={query}
-      setQuery={setQuery}
-      sort={sort}
-      onSort={changeSort}
-      onDataUpload={handleDataUpload}
-      isSorting={isSorting}
-    />
+      header={<AppHeader onUpload={processor.handleFiles} isProcessing={processor.status === 'parsing'} />}
+      footer={<AppFooter />}
+    >
+      {!showDashboard && (
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-semibold text-white">Upload your Spotify streaming history</h2>
+            <p className="text-sm text-zinc-400">
+              Drop JSON or ZIP files exported from Spotify to explore listening trends, top artists, and more.
+            </p>
+          </div>
+          <FileDropzone
+            onFilesSelected={processor.handleFiles}
+            isProcessing={processor.status === 'parsing'}
+            statusMessage={processor.message}
+          />
+          {processor.status === 'error' && processor.error && (
+            <ErrorBanner title="We hit a snag parsing your files." description={processor.error} onRetry={processor.reset} />
+          )}
+        </div>
+      )}
+
+      {showDashboard && (
+        <DashboardPage
+          plays={processor.plays}
+          filters={filters}
+          onFiltersChange={setFilters}
+          onExportJson={handleExportJson}
+          onExportCsv={handleExportCsv}
+          timelineGrouping={timelineGrouping}
+          onTimelineGroupingChange={setTimelineGrouping}
+          warnings={processor.warnings}
+        />
+      )}
+
+      <ProgressOverlay
+        visible={processor.status === 'parsing'}
+        message={processor.message}
+        progress={Math.round(processor.progress)}
+        currentFile={processor.currentFile}
+      />
+    </MainLayout>
   );
 }
 
-export default function App() {
-  return (
-    <ErrorBoundary>
-      <AppContent />
-    </ErrorBoundary>
-  );
-}
+export default App;

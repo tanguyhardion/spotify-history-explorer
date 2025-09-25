@@ -1,57 +1,51 @@
 # Spotify History Explorer
 
-A minimal web app to upload and explore your Spotify listening history locally in your browser.
+Visualize your Spotify streaming history, uncover top tracks and artists, and explore listening trends over time. This app runs entirely in the browser and keeps your data local.
 
 ## Features
 
-- Upload multiple `Streaming_History_Audio_*.json` files (supports multiple files from split archives)
-- Data is stored locally in IndexedDB for persistence
-- Search and sort by time, track, artist, album, and duration
-- Virtualized list for smooth scrolling through large histories
-- Quick stats: total playtime and most played artist
-
-## Getting Your Spotify Data
-
-1. Go to [Spotify Privacy Settings](https://www.spotify.com/account/privacy/)
-2. Scroll down to "Download your data" section
-3. Request your **Extended streaming history** (not the Account data)
-4. Wait for Spotify to prepare your data (can take several days)
-5. Download the ZIP file when you receive the email notification
-6. **Extract/Unzip the downloaded file** - you'll find multiple `Streaming_History_Audio_*.json` files
-7. Select all the JSON files when uploading to this app
-
-> **Note**: Spotify often splits large listening histories into multiple JSON files. This app supports uploading all of them at once for a complete history.
+- **File ingestion**: Drag-and-drop or browse to upload Spotify JSON files or ZIP exports containing *Spotify Extended Streaming History*.
+- **Fast parsing**: Large files are processed in a dedicated Web Worker with real-time progress feedback.
+- **Interactive dashboard**: Rich cards, charts, and virtualized lists highlight your listening habits.
+- **Filtering & search**: Narrow results by date range, artist, track, and free-text search.
+- **Insights**: See streaks, monthly favourites, and other personalized metrics.
+- **Exports**: Download summaries as JSON or the full play history as CSV.
+- **Responsive UI**: Dark, Spotify-inspired theme optimized for desktop and mobile.
 
 ## Getting Started
 
-1. Install dependencies:
-
-```cmd
+```bash
 npm install
-```
-
-2. Start the dev server:
-
-```cmd
 npm run dev
 ```
 
-3. Open the app (URL printed in the terminal, e.g. http://localhost:5173) and click `Upload Spotify JSON Files` to select your history files. You can select multiple files at once by holding Ctrl (Windows/Linux) or Cmd (Mac) while clicking.
+Open the URL printed in the terminal (typically http://localhost:5173) and upload your Spotify data.
 
-## Build
+## Supported Files
 
-```cmd
+- Individual `StreamingHistory*.json` files.
+- ZIP archives that contain the `Spotify Extended Streaming History/Streaming_History_Audio_*.json` files.
+
+If the expected files can’t be found, the app will display guidance for the proper structure.
+
+## Deployment
+
+The project is built with Vite and outputs a static bundle suitable for Netlify, Vercel, GitHub Pages, or any static host.
+
+```bash
 npm run build
 npm run preview
 ```
 
-## Privacy
+## Tech Stack
 
-Your data never leaves your browser: parsing, storage, and filtering happen entirely on your device using IndexedDB.
-
-## Tech
-
-- React + TypeScript + Vite
+- React + TypeScript
 - Tailwind CSS
-- IndexedDB via `idb`
-- Virtual list via `react-virtuoso`
+- Recharts for data visualization
+- JSZip for ZIP parsing
+- date-fns for date utilities
+- react-window for virtualized lists
+
+## License
+
+MIT

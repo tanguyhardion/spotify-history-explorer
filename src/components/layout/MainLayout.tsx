@@ -1,62 +1,15 @@
-import { Header } from "./Header";
-import Controls from "../Controls";
-import TrackList from "../TrackList";
-import Stats from "../Stats";
-import FileUpload from "../FileUpload";
-import type { Play, SortState, SortKey } from "../../types";
-
 interface MainLayoutProps {
-  data: Play[];
-  filteredData: Play[];
-  query: string;
-  setQuery: (query: string) => void;
-  sort: SortState;
-  onSort: (key: SortKey) => void;
-  onDataUpload: (data: Play[]) => void;
-  isSorting?: boolean;
+  header: React.ReactNode;
+  footer: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export function MainLayout({
-  data,
-  filteredData,
-  query,
-  setQuery,
-  sort,
-  onSort,
-  onDataUpload,
-  isSorting = false,
-}: MainLayoutProps) {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 dark">
-      <Header>
-        <FileUpload onData={onDataUpload} variant="header" />
-      </Header>
-
-      <main className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-4">
-        <Stats data={filteredData} />
-
-        <div className="p-3 rounded-lg border border-gray-700 bg-gray-800 shadow-sm">
-          <Controls
-            query={query}
-            setQuery={setQuery}
-            total={data.length}
-            filteredCount={filteredData.length}
-          />
-          <TrackList
-            data={filteredData}
-            sort={sort}
-            onSort={onSort}
-            isSorting={isSorting}
-          />
-        </div>
-
-        <footer className="text-center">
-          <p className="text-xs text-gray-400">
-            All data is processed locally in your browser. We don't upload
-            anything.
-          </p>
-        </footer>
-      </main>
-    </div>
-  );
-}
+export const MainLayout = ({ header, footer, children }: MainLayoutProps) => (
+  <div className="flex min-h-screen flex-col bg-zinc-950 text-white">
+    {header}
+    <main className="flex-1">
+      <div className="mx-auto w-full max-w-6xl px-6 py-10 sm:py-14">{children}</div>
+    </main>
+    {footer}
+  </div>
+);

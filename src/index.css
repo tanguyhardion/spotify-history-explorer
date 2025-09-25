@@ -1,48 +1,34 @@
 @import "tailwindcss";
 
-/* Global button styles */
-button:hover {
-  cursor: pointer;
+@theme {
+	--color-spotify-green: #1db953;
+	--color-spotify-green-foreground: #050505;
+	--font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 }
 
-/* Prevent unwanted pan scrolling on the body */
+:root {
+	color-scheme: dark;
+}
+
 body {
-  overscroll-behavior: contain;
+	@apply bg-zinc-950 text-white antialiased;
+	font-family: var(--font-sans);
 }
 
-/* Custom scrollbar styles */
+::selection {
+	background: rgba(29, 185, 84, 0.35);
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+	width: 10px;
+	height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(31 41 55); /* bg-gray-800 */
-  border-radius: 4px;
+	background: rgba(255, 255, 255, 0.05);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(75 85 99); /* bg-gray-600 */
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(107 114 128); /* bg-gray-500 */
-}
-
-::-webkit-scrollbar-corner {
-  background: rgb(31 41 55); /* bg-gray-800 */
-}
-
-/* Firefox scrollbar styles */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(75 85 99) rgb(31 41 55);
-}
-
-/* Ensure virtualized lists handle their own scrolling */
-[data-virtualized] {
-  overscroll-behavior: contain;
-  touch-action: pan-y;
+	background: rgba(29, 185, 84, 0.6);
+	border-radius: 9999px;
 }
