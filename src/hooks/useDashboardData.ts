@@ -1,49 +1,80 @@
-import { useMemo } from 'react';
-import {
-  buildTimeline,
-  calculateListeningStreaks,
-  getMonthlyTopTracks,
-  getTopEntities,
-  buildOverviewStats,
-  type TimelineGrouping
-} from '../services/analytics';
+import { useEffect, useRef, useState } from 'react';
+import type { TimelineGrouping } from '../services/analytics';
 import type { PlayFilters } from '../types/filters';
 import type { Play } from '../types/plays';
-import { isWithinRange } from '../utils/date';
+import type { AnalyticsWorkerOutgoingMessage, CalculationResult } from '../types/analyticsWorker';
+
+const initialResult: CalculationResult = {
+  filteredPlays: [],
+  overview: {
+    totalPlays: 0,
+    uniqueTracks: 0,
+    uniqueArtists: 0,
+    totalMsPlayed: 0,
+    averageMsPlayed: 0
+  },
+  topTracks: [],
+  topArtists: [],
+  topAlbums: [],
+  timeline: [],
+  listeningStreak: {
+    currentStreak: 0,
+    longestStreak: 0,
+    streaks: []
+  },
+  monthlyTopTracks: []
+};
 
 export const useDashboardData = (
   plays: Play[],
   filters: PlayFilters,
   timelineGrouping: TimelineGrouping
 ) => {
-  const filteredPlays = useMemo(() => {
-    const searchTerm = filters.searchTerm.trim().toLowerCase();
-    return plays.filter((play) => {
-      if (!isWithinRange(play.timestamp, filters)) return false;
-      if (filters.artist && play.artistName !== filters.artist) return false;
-      if (filters.track && play.trackName !== filters.track) return false;
-      if (!searchTerm) return true;
-      const haystack = `${play.trackName ?? ''} ${play.artistName ?? ''} ${play.albumName ?? ''}`.toLowerCase();
-      return haystack.includes(searchTerm);
+  const workerRef = useRef<Worker | null>(null);
+  const [data, setData] = useState<CalculationResult>(initialResult);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  useEffect(() => {
+    const worker = new Worker(new URL('../workers/analyticsWorker.ts', import.meta.url), {
+      type: 'module'
     });
-  }, [plays, filters]);
+    workerRef.current = worker;
 
-  const overview = useMemo(() => buildOverviewStats(filteredPlays), [filteredPlays]);
-  const topTracks = useMemo(() => getTopEntities(filteredPlays, 'trackName'), [filteredPlays]);
-  const topArtists = useMemo(() => getTopEntities(filteredPlays, 'artistName'), [filteredPlays]);
-  const topAlbums = useMemo(() => getTopEntities(filteredPlays, 'albumName'), [filteredPlays]);
-  const timeline = useMemo(() => buildTimeline(filteredPlays, timelineGrouping), [filteredPlays, timelineGrouping]);
-  const listeningStreak = useMemo(() => calculateListeningStreaks(filteredPlays), [filteredPlays]);
-  const monthlyTopTracks = useMemo(() => getMonthlyTopTracks(filteredPlays), [filteredPlays]);
+    worker.onmessage = (event: MessageEvent<AnalyticsWorkerOutgoingMessage>) => {
+      if (event.data.type === 'RESULT') {
+        setData(event.data.payload);
+        setIsCalculating(false);
+      }
+    };
 
-  return {
-    filteredPlays,
-    overview,
-    topTracks,
-    topArtists,
-    topAlbums,
-    timeline,
-    listeningStreak,
-    monthlyTopTracks
-  };
+    return () => {
+      worker.terminate();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (workerRef.current) {
+      setIsCalculating(true);
+      workerRef.current.postMessage({
+        type: 'SET_PLAYS',
+        payload: { plays }
+      });
+      workerRef.current.postMessage({
+        type: 'CALCULATE',
+        payload: { filters, timelineGrouping }
+      });
+    }
+  }, [plays]);
+
+  useEffect(() => {
+    if (workerRef.current) {
+      setIsCalculating(true);
+      workerRef.current.postMessage({
+        type: 'CALCULATE',
+        payload: { filters, timelineGrouping }
+      });
+    }
+  }, [filters, timelineGrouping]);
+
+  return { ...data, isCalculating };
 };

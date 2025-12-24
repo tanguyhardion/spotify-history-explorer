@@ -39,7 +39,7 @@ export const FilterBar = ({
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5 shadow-xl shadow-black/30 lg:flex-row lg:items-end lg:justify-between">
-      <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <label className="flex flex-col gap-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
           Date from
           <input

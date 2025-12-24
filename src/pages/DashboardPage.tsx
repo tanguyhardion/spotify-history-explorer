@@ -5,6 +5,7 @@ import { TimelineChart } from '../components/charts/TimelineChart';
 import { TopEntityChart } from '../components/charts/TopEntityChart';
 import { VirtualizedList } from '../components/ui/VirtualizedList';
 import { FilterBar } from '../components/ui/FilterBar';
+import { Spinner } from '../components/ui/Spinner';
 import { CHART_COLORS } from '../constants/charts';
 import type { Play } from '../types/plays';
 import type { PlayFilters } from '../types/filters';
@@ -31,7 +32,7 @@ export const DashboardPage = ({
   onTimelineGroupingChange,
   warnings
 }: DashboardPageProps) => {
-  const { overview, topTracks, topArtists, topAlbums, timeline, listeningStreak, monthlyTopTracks, filteredPlays } = useDashboardData(
+  const { overview, topTracks, topArtists, topAlbums, timeline, listeningStreak, monthlyTopTracks, filteredPlays, isCalculating } = useDashboardData(
     plays,
     filters,
     timelineGrouping
@@ -70,7 +71,15 @@ export const DashboardPage = ({
   }));
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 relative">
+      {isCalculating && (
+        <div className="absolute inset-0 z-50 flex items-start justify-center bg-black/20 pt-40 backdrop-blur-[1px] transition-all duration-300">
+           <div className="flex items-center gap-3 rounded-full bg-zinc-900/90 px-6 py-3 shadow-2xl border border-zinc-700/50 backdrop-blur-md">
+             <Spinner size={20} />
+             <span className="text-sm font-medium text-zinc-200">Updating insights...</span>
+           </div>
+        </div>
+      )}
       <section id="filters" className="space-y-6">
         <FilterBar
           filters={filters}
