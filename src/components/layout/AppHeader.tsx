@@ -6,6 +6,15 @@ interface AppHeaderProps {
   isProcessing: boolean;
 }
 
+const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const id = href.substring(1);
+  const element = document.getElementById(id);
+  if (element) {
+    e.preventDefault();
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
 export const AppHeader = ({ onUpload, isProcessing }: AppHeaderProps) => (
   <header className="sticky top-0 z-30 border-b border-zinc-800/60 bg-zinc-950/70 backdrop-blur">
     <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
@@ -21,13 +30,13 @@ export const AppHeader = ({ onUpload, isProcessing }: AppHeaderProps) => (
         </div>
       </div>
       <nav className="flex items-center gap-3 text-sm text-zinc-400">
-        <a href="#overview" className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 sm:block">
+        <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 sm:block">
           Overview
         </a>
-        <a href="#charts" className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 sm:block">
+        <a href="#charts" onClick={(e) => handleNavClick(e, '#charts')} className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 sm:block">
           Charts
         </a>
-        <a href="#insights" className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 md:block">
+        <a href="#insights" onClick={(e) => handleNavClick(e, '#insights')} className="hidden rounded-full px-3 py-1 hover:bg-zinc-800/60 md:block">
           Insights
         </a>
         <UploadButton onFilesSelected={onUpload} isProcessing={isProcessing} />
