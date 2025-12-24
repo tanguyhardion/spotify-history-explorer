@@ -173,17 +173,19 @@ export const DashboardPage = ({
             </div>
           </Card>
           <Card title="Monthly favourites" subtitle="Top track every month">
-            <div className="space-y-3 text-sm">
-              {monthlyTopTracks.map((entry) => (
-                <div key={entry.month} className="flex items-center justify-between rounded-xl border border-zinc-800/60 bg-zinc-950/40 px-4 py-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-zinc-500">{entry.month}</p>
-                    <p className="text-sm font-semibold text-white">{entry.trackName ?? 'Unknown track'}</p>
-                    <p className="text-xs text-zinc-400">{entry.artistName ?? 'Unknown artist'}</p>
+            <div className="max-h-64 overflow-y-auto rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-4">
+              <div className="space-y-3 text-sm">
+                {monthlyTopTracks.map((entry) => (
+                  <div key={entry.month} className="flex items-center justify-between rounded-xl border border-zinc-800/60 bg-zinc-900/40 px-4 py-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-zinc-500">{entry.month}</p>
+                      <p className="text-sm font-semibold text-white">{entry.trackName ?? 'Unknown track'}</p>
+                      <p className="text-xs text-zinc-400">{entry.artistName ?? 'Unknown artist'}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-spotify-green">{entry.playCount.toLocaleString()} plays</span>
                   </div>
-                  <span className="text-sm font-semibold text-spotify-green">{entry.playCount.toLocaleString()} plays</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </Card>
         </div>
