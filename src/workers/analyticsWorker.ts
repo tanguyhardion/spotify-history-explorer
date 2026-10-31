@@ -12,14 +12,12 @@ import type { AnalyticsWorkerIncomingMessage } from '../types/analyticsWorker';
 let allPlays: Play[] = [];
 
 self.onmessage = (event: MessageEvent<AnalyticsWorkerIncomingMessage>) => {
-  const { type, payload } = event.data;
+  const message = event.data;
 
-  if (type === 'SET_PLAYS') {
-    // @ts-ignore - payload is typed correctly in the union but TS might complain
-    allPlays = payload.plays;
-  } else if (type === 'CALCULATE') {
-    // @ts-ignore
-    const { filters, timelineGrouping } = payload;
+  if (message.type === 'SET_PLAYS') {
+    allPlays = message.payload.plays;
+  } else if (message.type === 'CALCULATE') {
+    const { requestId, filters, timelineGrouping } = message.payload;
 
     const searchTerm = filters.searchTerm.trim().toLowerCase();
     const filteredPlays = allPlays.filter((play) => {
@@ -41,8 +39,9 @@ self.onmessage = (event: MessageEvent<AnalyticsWorkerIncomingMessage>) => {
 
     self.postMessage({
       type: 'RESULT',
+      requestId,
       payload: {
-        filteredPlays,
+        filteredCount: filteredPlays.length,
         overview,
         topTracks,
         topArtists,

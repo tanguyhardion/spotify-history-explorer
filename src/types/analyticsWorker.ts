@@ -21,6 +21,7 @@ export interface SetPlaysMessage {
 export interface CalculateMessage {
   type: 'CALCULATE';
   payload: {
+    requestId: number;
     filters: PlayFilters;
     timelineGrouping: TimelineGrouping;
   };
@@ -29,7 +30,7 @@ export interface CalculateMessage {
 export type AnalyticsWorkerIncomingMessage = SetPlaysMessage | CalculateMessage;
 
 export interface CalculationResult {
-  filteredPlays: Play[];
+  filteredCount: number;
   overview: OverviewStats;
   topTracks: TopEntity[];
   topArtists: TopEntity[];
@@ -41,6 +42,7 @@ export interface CalculationResult {
 
 export interface SuccessMessage {
   type: 'RESULT';
+  requestId: number;
   payload: CalculationResult;
 }
 

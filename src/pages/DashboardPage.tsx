@@ -32,7 +32,7 @@ export const DashboardPage = ({
   onTimelineGroupingChange,
   warnings
 }: DashboardPageProps) => {
-  const { overview, topTracks, topArtists, topAlbums, timeline, listeningStreak, monthlyTopTracks, filteredPlays, isCalculating } = useDashboardData(
+  const { overview, topTracks, topArtists, topAlbums, timeline, listeningStreak, monthlyTopTracks, filteredCount, isCalculating } = useDashboardData(
     plays,
     filters,
     timelineGrouping
@@ -108,7 +108,7 @@ export const DashboardPage = ({
         <OverviewStatsGrid overview={overview} />
         <Card
           title="Listening timeline"
-          subtitle={`Showing ${filteredPlays.length.toLocaleString()} plays`}
+          subtitle={`Showing ${filteredCount.toLocaleString()} plays`}
           className="mt-6"
         >
           <TimelineChart data={timeline} />

@@ -5,7 +5,7 @@ import type { Play } from '../types/plays';
 import type { AnalyticsWorkerOutgoingMessage, CalculationResult } from '../types/analyticsWorker';
 
 const initialResult: CalculationResult = {
-  filteredPlays: [],
+  filteredCount: 0,
   overview: {
     totalPlays: 0,
     uniqueTracks: 0,
@@ -31,6 +31,7 @@ export const useDashboardData = (
   timelineGrouping: TimelineGrouping
 ) => {
   const workerRef = useRef<Worker | null>(null);
+  const latestRequestRef = useRef(0);
   const [data, setData] = useState<CalculationResult>(initialResult);
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -41,40 +42,33 @@ export const useDashboardData = (
     workerRef.current = worker;
 
     worker.onmessage = (event: MessageEvent<AnalyticsWorkerOutgoingMessage>) => {
-      if (event.data.type === 'RESULT') {
-        setData(event.data.payload);
-        setIsCalculating(false);
-      }
+      // Ignore results of superseded requests so stale data never overwrites newer filters.
+      if (event.data.type !== 'RESULT' || event.data.requestId !== latestRequestRef.current) return;
+      setData(event.data.payload);
+      setIsCalculating(false);
     };
 
     return () => {
       worker.terminate();
+      workerRef.current = null;
     };
   }, []);
 
+  // Worker holds its own copy of the plays; only re-send when they change.
   useEffect(() => {
-    if (workerRef.current) {
-      setIsCalculating(true);
-      workerRef.current.postMessage({
-        type: 'SET_PLAYS',
-        payload: { plays }
-      });
-      workerRef.current.postMessage({
-        type: 'CALCULATE',
-        payload: { filters, timelineGrouping }
-      });
-    }
+    workerRef.current?.postMessage({ type: 'SET_PLAYS', payload: { plays } });
   }, [plays]);
 
   useEffect(() => {
-    if (workerRef.current) {
-      setIsCalculating(true);
-      workerRef.current.postMessage({
-        type: 'CALCULATE',
-        payload: { filters, timelineGrouping }
-      });
-    }
-  }, [filters, timelineGrouping]);
+    const worker = workerRef.current;
+    if (!worker) return;
+    latestRequestRef.current += 1;
+    setIsCalculating(true);
+    worker.postMessage({
+      type: 'CALCULATE',
+      payload: { requestId: latestRequestRef.current, filters, timelineGrouping }
+    });
+  }, [plays, filters, timelineGrouping]);
 
   return { ...data, isCalculating };
 };
