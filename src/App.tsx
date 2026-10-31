@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import './index.css';
 import { AppHeader } from './components/layout/AppHeader';
 import { AppFooter } from './components/layout/AppFooter';
@@ -6,11 +6,15 @@ import { MainLayout } from './components/layout/MainLayout';
 import { FileDropzone } from './components/upload/FileDropzone';
 import { ProgressOverlay } from './components/ui/ProgressOverlay';
 import { ErrorBanner } from './components/ui/ErrorBanner';
-import { DashboardPage } from './pages/DashboardPage';
 import { useFileProcessor } from './hooks/useFileProcessor';
 import type { PlayFilters } from './types/filters';
 import { buildCsvRowsFromPlays, buildOverviewStats, buildTimeline, getTopEntities } from './services/analytics';
 import { downloadCsv, downloadJson } from './utils/download';
+
+// Charts (recharts) are only needed once data is loaded; keep them out of the initial bundle.
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then((module) => ({ default: module.DashboardPage }))
+);
 
 const defaultFilters: PlayFilters = {
   searchTerm: '',
@@ -81,16 +85,18 @@ function App() {
       )}
 
       {showDashboard && (
-        <DashboardPage
-          plays={processor.plays}
-          filters={filters}
-          onFiltersChange={setFilters}
-          onExportJson={handleExportJson}
-          onExportCsv={handleExportCsv}
-          timelineGrouping={timelineGrouping}
-          onTimelineGroupingChange={setTimelineGrouping}
-          warnings={processor.warnings}
-        />
+        <Suspense fallback={<p className="text-center text-sm text-zinc-400">Loading dashboard…</p>}>
+          <DashboardPage
+            plays={processor.plays}
+            filters={filters}
+            onFiltersChange={setFilters}
+            onExportJson={handleExportJson}
+            onExportCsv={handleExportCsv}
+            timelineGrouping={timelineGrouping}
+            onTimelineGroupingChange={setTimelineGrouping}
+            warnings={processor.warnings}
+          />
+        </Suspense>
       )}
 
       <ProgressOverlay
