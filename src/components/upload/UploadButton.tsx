@@ -17,7 +17,11 @@ export const UploadButton = ({ onFilesSelected, isProcessing }: UploadButtonProp
         multiple
         accept=".json,.zip,application/zip"
         className="hidden"
-        onChange={() => onFilesSelected(inputRef.current?.files ?? null)}
+        onChange={() => {
+          onFilesSelected(inputRef.current?.files ?? null);
+          // Allow selecting the same file again later.
+          if (inputRef.current) inputRef.current.value = '';
+        }}
         disabled={isProcessing}
       />
       <Button

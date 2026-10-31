@@ -33,6 +33,8 @@ export const FileDropzone = ({ onFilesSelected, isProcessing, statusMessage }: F
 
   const onChange = useCallback(() => {
     onFilesSelected(inputRef.current?.files ?? null);
+    // Allow selecting the same file again later.
+    if (inputRef.current) inputRef.current.value = '';
   }, [onFilesSelected]);
 
   return (

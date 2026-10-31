@@ -1,5 +1,6 @@
 export const Spinner = ({ size = 24 }: { size?: number }) => (
   <svg
+    aria-hidden="true"
     className="animate-spin text-spotify-green"
     xmlns="http://www.w3.org/2000/svg"
     width={size}

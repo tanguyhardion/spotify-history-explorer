@@ -13,7 +13,7 @@ export const Card = ({ title, subtitle, actions, className, children }: CardProp
     {(title || subtitle || actions) && (
       <header className="mb-5 flex items-start justify-between gap-4">
         <div>
-          {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
+          {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
           {subtitle && <p className="mt-1 text-sm text-zinc-400">{subtitle}</p>}
         </div>
         {actions && <div className="flex shrink-0 items-center gap-2 text-sm text-zinc-400">{actions}</div>}

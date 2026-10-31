@@ -105,9 +105,10 @@ export const FilterBar = ({
             <button
               key={button.id}
               type="button"
+              aria-pressed={timelineGrouping === button.id}
               onClick={() => onTimelineGroupingChange(button.id)}
               className={clsx(
-                'rounded-full px-3 py-1 transition',
+                'rounded-full px-3 py-1 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-spotify-green',
                 timelineGrouping === button.id
                   ? 'bg-spotify-green text-black'
                   : 'hover:bg-zinc-800/70'
