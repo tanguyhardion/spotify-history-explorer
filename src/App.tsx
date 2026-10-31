@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './index.css';
 import { AppHeader } from './components/layout/AppHeader';
 import { AppFooter } from './components/layout/AppFooter';
@@ -25,40 +25,29 @@ function App() {
   const [filters, setFilters] = useState<PlayFilters>(defaultFilters);
   const [timelineGrouping, setTimelineGrouping] = useState<'day' | 'week' | 'month'>('week');
 
+  // When a new dataset is ready, reset filters and default the date range to its span.
   useEffect(() => {
-    if (processor.status === 'ready') {
-      setFilters(defaultFilters);
-    }
-  }, [processor.status]);
-
-  useEffect(() => {
-    if (processor.status === 'ready' && processor.plays.length) {
-      const first = processor.plays[0]?.timestamp.slice(0, 10) ?? null;
-      const last = processor.plays.at(-1)?.timestamp.slice(0, 10) ?? null;
-      setFilters((prev) => ({
-        ...prev,
-        startDate: first,
-        endDate: last
-      }));
-    }
+    if (processor.status !== 'ready') return;
+    const first = processor.plays[0]?.timestamp.slice(0, 10) ?? null;
+    const last = processor.plays.at(-1)?.timestamp.slice(0, 10) ?? null;
+    setFilters({ ...defaultFilters, startDate: first, endDate: last });
   }, [processor.status, processor.plays]);
 
   const showDashboard = processor.status === 'ready' && processor.plays.length > 0;
 
-  const exportSummary = useMemo(() => {
-    if (!processor.plays.length) return null;
-    const overview = buildOverviewStats(processor.plays);
-    const topTracks = getTopEntities(processor.plays, 'trackName');
-    const topArtists = getTopEntities(processor.plays, 'artistName');
-    const topAlbums = getTopEntities(processor.plays, 'albumName');
-    const timeline = buildTimeline(processor.plays, timelineGrouping);
-
-    return { overview, topTracks, topArtists, topAlbums, timeline };
-  }, [processor.plays, timelineGrouping]);
-
   const handleExportJson = () => {
-    if (!exportSummary) return;
-    downloadJson(exportSummary, 'spotify-history-summary.json');
+    if (!processor.plays.length) return;
+    const { plays } = processor;
+    downloadJson(
+      {
+        overview: buildOverviewStats(plays),
+        topTracks: getTopEntities(plays, 'trackName'),
+        topArtists: getTopEntities(plays, 'artistName'),
+        topAlbums: getTopEntities(plays, 'albumName'),
+        timeline: buildTimeline(plays, timelineGrouping)
+      },
+      'spotify-history-summary.json'
+    );
   };
 
   const handleExportCsv = () => {

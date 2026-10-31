@@ -3,13 +3,27 @@ import { Card } from '../components/ui/Card';
 import { OverviewStatsGrid } from '../components/ui/OverviewStats';
 import { TimelineChart } from '../components/charts/TimelineChart';
 import { TopEntityChart } from '../components/charts/TopEntityChart';
-import { VirtualizedList } from '../components/ui/VirtualizedList';
+import { VirtualizedList, type VirtualizedListItem } from '../components/ui/VirtualizedList';
 import { FilterBar } from '../components/ui/FilterBar';
 import { Spinner } from '../components/ui/Spinner';
 import { CHART_COLORS } from '../constants/charts';
 import type { Play } from '../types/plays';
+import type { TopEntity } from '../types/analytics';
 import type { PlayFilters } from '../types/filters';
 import { useDashboardData } from '../hooks/useDashboardData';
+
+const toListItems = (
+  entities: TopEntity[],
+  secondaryKey: 'artistName' | 'trackName',
+  fallback: string
+): VirtualizedListItem[] =>
+  entities.map((entity) => ({
+    key: entity.name,
+    primary: entity.name,
+    secondary: entity.sampleTrack?.[secondaryKey] ?? fallback,
+    value: `${entity.count.toLocaleString()} plays`,
+    meta: `${entity.percentage.toFixed(1)}%`
+  }));
 
 interface DashboardPageProps {
   plays: Play[];
@@ -46,29 +60,9 @@ export const DashboardPage = ({
     Array.from(new Set(plays.map((play) => play.trackName).filter(Boolean) as string[])).sort(),
   [plays]);
 
-  const topTrackItems = topTracks.map((track) => ({
-    key: track.name,
-    primary: track.name,
-    secondary: track.sampleTrack?.artistName ?? 'Unknown artist',
-    value: `${track.count.toLocaleString()} plays`,
-    meta: `${track.percentage.toFixed(1)}%`
-  }));
-
-  const topArtistItems = topArtists.map((artist) => ({
-    key: artist.name,
-    primary: artist.name,
-    secondary: artist.sampleTrack?.trackName ?? 'Unknown track',
-    value: `${artist.count.toLocaleString()} plays`,
-    meta: `${artist.percentage.toFixed(1)}%`
-  }));
-
-  const topAlbumItems = topAlbums.map((album) => ({
-    key: album.name,
-    primary: album.name,
-    secondary: album.sampleTrack?.artistName ?? 'Unknown artist',
-    value: `${album.count.toLocaleString()} plays`,
-    meta: `${album.percentage.toFixed(1)}%`
-  }));
+  const topTrackItems = useMemo(() => toListItems(topTracks, 'artistName', 'Unknown artist'), [topTracks]);
+  const topArtistItems = useMemo(() => toListItems(topArtists, 'trackName', 'Unknown track'), [topArtists]);
+  const topAlbumItems = useMemo(() => toListItems(topAlbums, 'artistName', 'Unknown artist'), [topAlbums]);
 
   return (
     <div className="flex flex-col gap-10 relative">

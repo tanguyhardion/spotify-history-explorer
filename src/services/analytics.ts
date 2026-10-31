@@ -8,8 +8,7 @@ import type {
   TopEntity
 } from '../types/analytics';
 import type { Play } from '../types/plays';
-import { formatMinutes, formatNumber } from '../utils/format';
-import { formatMsToDuration, toDayKey, toMonthKey, toWeekKey } from '../utils/date';
+import { toDayKey, toMonthKey, toWeekKey } from '../utils/date';
 
 export const buildOverviewStats = (plays: Play[]): OverviewStats => {
   const totalPlays = plays.length;
@@ -171,11 +170,3 @@ export const buildCsvRowsFromPlays = (plays: Play[]): string[][] => {
   ]);
   return [header, ...rows];
 };
-
-export const describeOverview = (overview: OverviewStats) => [
-  ['Total plays', formatNumber(overview.totalPlays)],
-  ['Unique tracks', formatNumber(overview.uniqueTracks)],
-  ['Unique artists', formatNumber(overview.uniqueArtists)],
-  ['Total time', formatMsToDuration(overview.totalMsPlayed)],
-  ['Average play length', formatMinutes(overview.averageMsPlayed)]
-];
